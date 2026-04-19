@@ -44,7 +44,7 @@ RUN npm install -g pnpm && SHELL=bash pnpm setup
 COPY --from=builder /agent-browser/cli/target/release/agent-browser /usr/local/bin/agent-browser
 
 # Install search-cli
-COPY app/search_engine/cli /opt/search-cli
+COPY search-cli /opt/search-cli
 RUN cd /opt/search-cli && npm install \
     && chmod +x search-cli.js \
     && ln -s /opt/search-cli/search-cli.js /usr/local/bin/search-cli
