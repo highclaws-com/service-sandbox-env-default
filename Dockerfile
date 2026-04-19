@@ -45,8 +45,8 @@ COPY --from=builder /agent-browser/cli/target/release/agent-browser /usr/local/b
 
 # Install search-cli
 COPY search-cli /opt/search-cli
-RUN cd /opt/search-cli && npm install \
+RUN cd /opt/search-cli/src && npm install \
     && chmod +x search-cli.js \
-    && ln -s /opt/search-cli/search-cli.js /usr/local/bin/search-cli
+    && ln -s /opt/search-cli/src/search-cli.js /usr/local/bin/search-cli
 
 WORKDIR /home/node
