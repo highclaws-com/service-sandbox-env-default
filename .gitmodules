@@ -1,0 +1,3 @@
+[submodule "search-cli"]
+	path = search-cli
+	url = https://github.com/highclaws-com/search-cli.git
