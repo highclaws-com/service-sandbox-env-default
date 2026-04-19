@@ -1,3 +1,7 @@
 [submodule "search-cli"]
 	path = search-cli
 	url = https://github.com/highclaws-com/search-cli.git
+[submodule "browser-cli"]
+	path = browser-cli
+	url = https://github.com/highclaws-com/agent-browser.git
+	branch = feat-tab-isolation

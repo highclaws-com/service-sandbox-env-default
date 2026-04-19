@@ -21,9 +21,8 @@ RUN npm install -g pnpm && SHELL=bash pnpm setup
 
 # Clone and build the agent-browser cli with a tab-isolation feature
 WORKDIR /agent-browser
-RUN git clone --depth 1 -b feat-tab-isolation https://github.com/highclaws-com/agent-browser.git . \
-    && pnpm install \
-    && pnpm build:native
+COPY browser-cli .
+RUN pnpm install && pnpm build:native
 
 FROM node:22-trixie-slim
 
