@@ -48,4 +48,4 @@ RUN cd /opt/search-cli/src && npm install \
     && chmod +x search-cli.js \
     && ln -s /opt/search-cli/src/search-cli.js /usr/local/bin/search-cli
 
-WORKDIR /home/node
+WORKDIR /worktrees
