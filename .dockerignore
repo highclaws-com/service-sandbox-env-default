@@ -1,0 +1,17 @@
+**/.git
+**/node_modules
+**/dist
+**/target
+**/.next
+**/out
+**/.pnpm-store
+**/__pycache__
+**/*.tsbuildinfo
+**/npm-debug.log*
+**/*.log
+**/.idea
+**/.vscode
+**/*.swp
+**/*.swo
+**/.DS_Store
+**/Thumbs.db
