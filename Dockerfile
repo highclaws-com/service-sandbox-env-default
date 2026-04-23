@@ -26,12 +26,13 @@ RUN pnpm install && pnpm build:native
 
 FROM node:22-trixie-slim
 
-# Install system dependencies: git, curl, ping, and python3
+# Install system dependencies, i.e., frequent tools available to AI agents.
 RUN apt-get update && apt-get install -y \
     git \
     curl \
     iputils-ping \
     python3 \
+    postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
 # Install pnpm
