@@ -7,10 +7,19 @@ terminal:
   backend: "local"
   cwd: "/home/agent"
 
+approvals:
+  mode: off
+
+#model:
+#  default: gpt-5.4-mini
+#  provider: openai-codex
+#  base_url: https://chatgpt.com/backend-api/codex
+
 model:
-  default: gpt-5.4-mini
-  provider: openai-codex
-  base_url: https://chatgpt.com/backend-api/codex
+  default: minimax/minimax-m2.5:free
+  provider: openrouter
+  base_url: https://openrouter.ai/api/v1
+  api_mode: chat_completions
 
 streaming:
   enabled: true
@@ -18,3 +27,44 @@ streaming:
   edit_interval: 1.0
   buffer_threshold: 40
   cursor: " ▉"
+
+delegation:
+  max_concurrent_children: 3
+  max_spawn_depth: 1
+  orchestrator_enabled: true
+
+clarify:
+  timeout: 120
+
+checkpoints:
+  enabled: false
+
+discord:
+  auto_thread: true
+
+group_sessions_per_user: false
+
+platform_toolsets:
+  api_server:
+    - terminal
+    - file
+    - web
+    - memory
+    - todo
+    - skills
+    - session_search
+    - cronjob
+    - messaging
+    - code_execution
+  discord:
+    - terminal
+    - file
+    - web
+    - memory
+    - todo
+    - skills
+    - session_search
+    - cronjob
+    - messaging
+    - code_execution
+    - discord
