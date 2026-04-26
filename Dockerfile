@@ -85,4 +85,4 @@ COPY --chown=agent:agent ./hermes/env /home/agent/.hermes/.env
 COPY --chown=agent:agent ./hermes/config.yaml /home/agent/.hermes/config.yaml
 
 WORKDIR /worktrees
-CMD ["hermes", "gateway"]
+CMD ["hermes", "gateway", "run"]
