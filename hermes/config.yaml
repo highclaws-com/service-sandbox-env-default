@@ -15,7 +15,7 @@ model:
   #api_key: vk-openrouter
 
   #default: openai/gpt-5.4-mini
-  #api_key: vk-codex
+  #api_key: vk-openai-codex
 
   #default: minimax-m2.5-free
   #api_key: vk-opencode-zen
