@@ -66,15 +66,9 @@ RUN groupmod -n agent node && \
 USER agent
 WORKDIR /home/agent
 
-# build Hermes
-ARG HERMES_SOURCE
-RUN wget -qO hermes.tar.gz "$HERMES_SOURCE" && \
-    tar xzf hermes.tar.gz && \
-    mv hermes-agent-* hermes && \
-    rm hermes.tar.gz
-
 # set up Hermes
 ENV PATH="/home/agent/.local/bin:${PATH}"
+COPY --chown=agent:agent ./hermes/fork /home/agent/hermes
 RUN cd hermes && \
     pip install --no-cache-dir -e ".[cli,messaging,cron,pty]" --break-system-packages && \
     bash -c "mkdir -p ~/.hermes/{cron,sessions,logs,memories,skills}" && \

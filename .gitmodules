@@ -5,3 +5,6 @@
 	path = browser-cli
 	url = https://github.com/highclaws-com/agent-browser.git
 	branch = feat-tab-isolation
+[submodule "hermes/fork"]
+	path = hermes/fork
+	url = https://github.com/highclaws-com/hermes-agent-fork.git
