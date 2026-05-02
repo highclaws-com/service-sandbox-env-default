@@ -35,8 +35,11 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     postgresql-client \
     wget \
-    ripgrep \
     sudo \
+    ripgrep \
+    python3-venv \
+    iproute2 \
+    procps \
     && rm -rf /var/lib/apt/lists/*
 
 # Install pnpm
