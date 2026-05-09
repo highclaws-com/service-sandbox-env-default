@@ -17,7 +17,7 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 # Install pnpm
 ENV PNPM_HOME="/root/.local/share/pnpm"
 ENV PATH="${PNPM_HOME}:${PATH}"
-RUN npm install -g pnpm && SHELL=bash pnpm setup
+RUN npm install -g pnpm@9.15.9 && SHELL=bash pnpm setup
 
 # Clone and build the agent-browser cli with a tab-isolation feature
 WORKDIR /agent-browser
@@ -45,7 +45,7 @@ RUN apt-get update && apt-get install -y \
 # Install pnpm
 ENV PNPM_HOME="/root/.local/share/pnpm"
 ENV PATH="${PNPM_HOME}:${PATH}"
-RUN npm install -g pnpm && rm -rf /root/.npm && SHELL=bash pnpm setup
+RUN npm install -g pnpm@9.15.9 && rm -rf /root/.npm && SHELL=bash pnpm setup
 
 # Only keep the rust build binary as requested
 COPY --from=builder /agent-browser/cli/target/release/agent-browser /usr/local/bin/agent-browser
