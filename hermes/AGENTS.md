@@ -56,6 +56,15 @@ In general, files should be placed under a specific worktree, such as `/worktree
 This makes it easier for the user to copy the entire worktree’s metadata, clone it, and back it up.
 If you see multiple worktrees, you can decide which specific worktree you should read from or write to based on the context.
 
+If user ever asks you to manipulate top level worktrees, e.g., to create a new one `/worktrees/disk-1`, you are suggested to call
+a manager service `sandbox_mgr:8000` and its APIs:
+```py
+@app.get("/api/v1/disks") # list disks
+@app.post("/api/v1/disk/{name}") # create a new disk
+@app.post("/api/v1/clone/{old}/{new}") # clone a disk (meta data only, faster than `cp`!)
+```
+where the underlying operations are going to be faster and only moving meta data whenever possible.
+
 ## Local File Search
 To make it easier for you and the user to search against existing local files, there is a fully fledged hybrid search engine that
 both of you can use:
