@@ -40,6 +40,7 @@ RUN apt-get update && apt-get install -y \
     python3-venv \
     iproute2 \
     procps \
+    supervisor \
     && rm -rf /var/lib/apt/lists/*
 
 # Install pnpm
@@ -81,5 +82,15 @@ RUN cd hermes && \
 COPY --chown=agent:agent ./hermes/env /home/agent/.hermes/.env
 COPY --chown=agent:agent ./hermes/config.yaml /home/agent/.hermes/config.yaml
 
+# set up Supervisor
+USER root
+COPY supervisor/supervisord.conf /etc/supervisor/supervisord.conf
+COPY supervisor/conf.d/hermes.conf /etc/supervisor/conf.d/hermes.conf
+COPY sandbox-entrypoint.sh /usr/local/bin/sandbox-entrypoint.sh
+RUN chmod 0755 /usr/local/bin/sandbox-entrypoint.sh && \
+    mkdir -p /var/log/supervisor /worktrees/.supervisor/conf.d && \
+    chown -R agent:agent /worktrees
+
 WORKDIR /worktrees
-CMD ["hermes", "gateway", "run"]
+ENTRYPOINT ["/usr/local/bin/sandbox-entrypoint.sh"]
+CMD ["supervisord", "-c", "/etc/supervisor/supervisord.conf", "-n"]
