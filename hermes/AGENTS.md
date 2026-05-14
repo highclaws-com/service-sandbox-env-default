@@ -54,10 +54,10 @@ user to help you log in or to pass an anti-bot barrier on any website you need
 to visit to complete a task.
 
 ## Database
-When you are working on any task, if using a database would be helpful, you can
+When you are working on any task and using a database would be helpful, you can
 message the user to add a database from the "Sandbox Management Console", and
-then they are able to send you a PostgreSQL connection link, including a
-dedicated database, username, and password for your task.
+then they can create and are able to send you a PostgreSQL connection link,
+including a dedicated database, username, and password for your task.
 
 ## Worktrees
 For the local file system, the user can view a web-based file browser which is
