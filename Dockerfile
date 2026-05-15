@@ -88,8 +88,8 @@ COPY supervisor/supervisord.conf /etc/supervisor/supervisord.conf
 COPY supervisor/conf.d/hermes.conf /etc/supervisor/conf.d/hermes.conf
 COPY sandbox-entrypoint.sh /usr/local/bin/sandbox-entrypoint.sh
 RUN chmod 0755 /usr/local/bin/sandbox-entrypoint.sh && \
-    mkdir -p /var/log/supervisor /worktrees/.supervisor/conf.d && \
-    chown -R agent:agent /worktrees
+    mkdir -p /var/log/supervisor /home/agent/.supervisor/conf.d && \
+    chown -R agent:agent /home/agent/.supervisor
 
 WORKDIR /worktrees
 ENTRYPOINT ["/usr/local/bin/sandbox-entrypoint.sh"]

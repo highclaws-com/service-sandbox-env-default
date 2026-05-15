@@ -109,10 +109,11 @@ Do check for conflicting ports if multiple services have been created.
 
 Built-in service definitions live in `/etc/supervisor/conf.d`. Your own
 persistent service definitions should live in
-`/worktrees/.supervisor/conf.d/*.conf` because `/worktrees` is backed by the
-user's persistent sandbox storage and survives container recreation.
+`/home/agent/.supervisor/conf.d/*.conf` because `/home/agent/.supervisor` is
+backed by the user's persistent sandbox storage and survives container
+recreation.
 
-Hypothetically, a minimal example at `/worktrees/.supervisor/conf.d/my-service.conf`:
+Hypothetically, a minimal example at `/home/agent/.supervisor/conf.d/my-service.conf`:
 ```ini
 [program:my-service]
 directory=/worktrees/disk-1/my-service
