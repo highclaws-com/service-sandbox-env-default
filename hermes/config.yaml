@@ -2,6 +2,8 @@ platforms:
   api_server:
     extra:
       host: 0.0.0.0
+  line:
+    enabled: true
 terminal:
   backend: local
   cwd: /home/agent
