@@ -171,6 +171,12 @@ $ cloudflared tunnel --url http://localhost:8646/
 (make sure you also make this tunnel consistant so that user do not lose LINE
 connection after container restart)
 
+To double check if this webhook is working, use health check GET API:
+```sh
+curl https://sells-cited-constitutes-execute.trycloudflare.com/line/webhook/health
+```
+A good response should look like `{"status": "ok", "platform": "line"}`.
+
 After the tunnel is established, let the user know he/she should visit
 `https://developers.line.biz/console` and update the webhook URL in the Channel
 with Message API. Assuming the cloudflared output above, user should set the
