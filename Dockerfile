@@ -74,7 +74,7 @@ WORKDIR /home/agent
 ENV PATH="/home/agent/.local/bin:${PATH}"
 COPY --chown=agent:agent ./hermes/fork /home/agent/hermes
 RUN cd hermes && \
-    pip install --no-cache-dir -e ".[cli,messaging,cron,pty]" --break-system-packages && \
+    pip install --no-cache-dir -e ".[cli,messaging,cron,pty,feishu]" "websockets==15.0.1" --break-system-packages && \
     bash -c "mkdir -p ~/.hermes/{cron,sessions,logs,memories,skills}" && \
     bash -c "cp cli-config.yaml.example ~/.hermes/config.yaml.example" && \
     bash -c "cp .env.example ~/.hermes/.env.example"
