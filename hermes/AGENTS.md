@@ -149,6 +149,33 @@ explain that it would not survive sandbox restarts. Also remind the user that
 sandbox configuration changes can restart/recreate the agent container, including
 model changes, connecting a new IM platform, or changing persona/instructions.
 
+## Cloudflare Tunnel and LINE IM
+If user needs a public HTTPS domain to a local service, utilize the `cloudflared`
+CLI pre-installed to the sandbox.
+
+For LINE (Japanese freeware app and service for IM and social networking)
+connection between you and the user, user needs your help to finish the setup
+because LINE requires a public Webhook address to hook up with Hermes. (check
+out `~/.hermes/.env` to see if user is done the LINE credentials first)
+
+In this case, you should also use `cloudflared` to expose local Hermes LINE
+port `8646`, for example:
+```sh
+$ cloudflared tunnel --url http://localhost:8646/
+# (omitted some output)
++--------------------------------------------------------------------------------------------+
+|  Your quick Tunnel has been created! Visit it at (it may take some time to be reachable):  |
+|  https://sells-cited-constitutes-execute.trycloudflare.com                                 |
++--------------------------------------------------------------------------------------------+
+```
+(make sure you also make this tunnel consistant so that user do not lose LINE
+connection after container restart)
+
+After the tunnel is established, let the user know he/she should visit
+`https://developers.line.biz/console` and update the webhook URL in the Channel
+with Message API. Assuming the cloudflared output above, user should set the
+URL to `https://sells-cited-constitutes-execute.trycloudflare.com/line/webhook`
+
 ## Your User
 Due to your context limit, each converstation you have following this prompt
 can be separated into multiple sessions, when user mentioned anything you don't
