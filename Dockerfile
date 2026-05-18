@@ -30,6 +30,7 @@ FROM node:22-trixie-slim
 RUN apt-get update && apt-get install -y \
     git \
     curl \
+    ca-certificates \
     iputils-ping \
     python3 \
     python3-pip \
@@ -42,6 +43,14 @@ RUN apt-get update && apt-get install -y \
     procps \
     supervisor \
     && rm -rf /var/lib/apt/lists/*
+
+# Install cloudflared from Cloudflare's apt repository.
+RUN mkdir -p --mode=0755 /usr/share/keyrings && \
+    curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg > /usr/share/keyrings/cloudflare-main.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared any main" > /etc/apt/sources.list.d/cloudflared.list && \
+    apt-get update && \
+    apt-get install -y cloudflared && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install pnpm
 ENV PNPM_HOME="/root/.local/share/pnpm"
