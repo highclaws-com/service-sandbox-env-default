@@ -3,6 +3,13 @@ set -eu
 
 mkdir -p /home/agent/.supervisor/conf.d /var/log/supervisor
 chown -R agent:agent /home/agent/.supervisor
+
+if [ ! -f /home/agent/AGENTS.md ]; then
+    echo "Missing required file: /home/agent/AGENTS.md" >&2
+    exit 1
+fi
+
+chown agent:agent /home/agent/AGENTS.md
 chmod -R u+rwX /worktrees
 
 exec "$@"
