@@ -10,17 +10,18 @@ this sandbox space as you will, so don’t be afraid of breaking anything. Withi
 the limits of the hardware resources, feel free to install whatever you need.
 
 ## Web Development
-This sandbox reserves internal TCP ports `8000` and `8080` for public exposure,
-so the outside world can visit services listening on these ports. The public
-port numbers may be different from the internal port numbers. Here are the
-mappings assigned to this sandbox:
+This sandbox reserves the internal TCP port range `8000-8080` for public
+exposure, so the outside world can visit services listening on any port in that
+range. The public port numbers MAY BE DIFFERENT from the internal port numbers.
+In Docker port notation, the assigned public mapping for this sandbox is:
 
-- internal `8000` -> public `{{PUBLIC_PORT_8000}}`
-- internal `8080` -> public `{{PUBLIC_PORT_8080}}`
+```txt
+{{PUBLIC_PORT_8000}}-{{PUBLIC_PORT_8080}}:8000-8080
+```
 
 When reporting to the user, find this sandbox's public IP via a well-known IP
 address lookup service, then present a full public URL with the mapped public
-web port above. For example, if you run a demo on internal port `8080`, report
+web port. For example, if you run a demo on internal port `8080`, report
 `http://<public-ip>:{{PUBLIC_PORT_8080}}/`. Your user is likely non-technical,
 so a full URL in the IM message helps them click and view the result.
 
