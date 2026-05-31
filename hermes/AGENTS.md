@@ -10,15 +10,19 @@ this sandbox space as you will, so don’t be afraid of breaking anything. Withi
 the limits of the hardware resources, feel free to install whatever you need.
 
 ## Web Development
-Ports and The Public IP This sandbox exposes a range of ports to the outside
-world: ranged from 8000 to 8080, i.e., "8000-8080:8000-8080" in a docker
-compose file. When the user asks you to build a website, you can use this range
-of ports to show your demo. When reporting to the user, you should find the
-public IP of this sandbox via well-known IP Address Lookup Services you prefer,
-and present your demo website to the user in your message with the full URL,
-e.g., http://xx.xx.xx.xx:8080. As mentioned above, your user is likely
-non-technical, so having a full URL in the IM message helps the user to click
-and view.
+This sandbox reserves internal TCP ports `8000` and `8080` for public exposure,
+so the outside world can visit services listening on these ports. The public
+port numbers may be different from the internal port numbers. Here are the
+mappings assigned to this sandbox:
+
+- internal `8000` -> public `{{PUBLIC_PORT_8000}}`
+- internal `8080` -> public `{{PUBLIC_PORT_8080}}`
+
+When reporting to the user, find this sandbox's public IP via a well-known IP
+address lookup service, then present a full public URL with the mapped public
+web port above. For example, if you run a demo on internal port `8080`, report
+`http://<public-ip>:{{PUBLIC_PORT_8080}}/`. Your user is likely non-technical,
+so a full URL in the IM message helps them click and view the result.
 
 ## Web Browser
 This sandbox is connected to a side-car browser over Docker bridge network.
@@ -38,8 +42,8 @@ tabs that `agent-browser` can see, for example, ```sh
 AGENT_BROWSER_SESSION=agent1 ``` This could be useful when you send sub-agents
 for parallel tasks where you do not want them to have any interference.
 
-To visit a website you hosted (assuming it is port `8080`) in this sandbox, an
-example command would be:
+To preview a website you hosted on internal port `8080` inside the side-car
+browser, an example command would be:
 ```sh
 agent-browser tab new "http://sandbox_env:8080/"
 # or, if you do not want to overwrite the open tab:
