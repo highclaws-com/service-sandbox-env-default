@@ -4,7 +4,7 @@ import os
 from urllib import request
 
 
-URL = f"{os.environ['NOTIFICATION_BASE_URL']}/api/v1/events"
+URL = f"{os.environ['NOTIFICATION_BASE_URL']}/api/v1/event"
 
 
 def _post_json(url: str, payload: dict) -> None:

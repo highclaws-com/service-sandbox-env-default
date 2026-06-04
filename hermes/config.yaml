@@ -44,6 +44,11 @@ clarify:
   timeout: 120
 checkpoints:
   enabled: false
+hooks_auto_accept: true
+hooks:
+  transform_llm_output:
+  - command: python3 /home/agent/.hermes/llm-hooks/notify_cronjob_news.py
+    timeout: 5
 discord:
   auto_thread: true
 group_sessions_per_user: false
