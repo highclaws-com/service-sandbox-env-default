@@ -1,0 +1,4 @@
+name: notification
+description: Forward agent:end events to notification service.
+events:
+  - agent:end
