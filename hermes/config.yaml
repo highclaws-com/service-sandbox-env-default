@@ -45,6 +45,9 @@ clarify:
 checkpoints:
   enabled: false
 hooks_auto_accept: true
+plugins:
+  enabled:
+    - cron_capture
 discord:
   auto_thread: true
 group_sessions_per_user: false
