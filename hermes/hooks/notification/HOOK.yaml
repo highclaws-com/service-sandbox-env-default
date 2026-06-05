@@ -1,4 +1,4 @@
 name: notification
-description: Forward agent:end events to notification service.
+description: Forward cron job events to notification service.
 events:
-  - agent:end
+  - job:end
