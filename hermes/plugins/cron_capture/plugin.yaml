@@ -1,0 +1,3 @@
+name: cron_capture
+description: Captures agent thinking process for cron jobs and forwards to notification service
+version: 1.0.0
