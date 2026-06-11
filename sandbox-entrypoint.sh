@@ -12,7 +12,9 @@ chown -R agent:agent /home/agent/.supervisor
 chown agent:agent \
     /home/agent/.hermes/memories \
     /home/agent/.hermes/cron \
-    /home/agent/.hermes/skills || true
+    /home/agent/.hermes/skills \
+    /home/agent/.hermes/sessions \
+    /home/agent/.hermes/state.* || true
 
 if [ ! -f /home/agent/AGENTS.md ]; then
     echo "Missing required file: /home/agent/AGENTS.md" >&2
