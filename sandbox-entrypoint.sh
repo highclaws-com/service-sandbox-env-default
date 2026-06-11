@@ -13,6 +13,11 @@ if [ ! -f /home/agent/AGENTS.md ]; then
 fi
 
 chown agent:agent /home/agent/AGENTS.md
-chmod -R u+rwX /worktrees
+
+for path in /worktrees /worktrees/* /worktrees/.[!.]* /worktrees/..?*; do
+    [ -e "$path" ] || continue
+    [ -d "$path" ] || continue
+    chmod u+rwx "$path" || true
+done
 
 exec "$@"
