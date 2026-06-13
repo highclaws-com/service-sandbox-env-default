@@ -85,15 +85,16 @@ worktree under this directory whenever possible. Files under `/worktrees` are
 the user's visible and persistent sandbox files. Files written elsewhere may
 disappear when the container is recreated. There can be multiple worktrees
 under `/worktrees`, they are mostly "folders" created by the user except for
-the first default one called `disk-1`. In general, files should be placed under
-a specific worktree, such as `/worktrees/disk-1`, rather than directly at the
+the first default one called `{{INIT_DISK_NAME}}`. In general, files should be
+placed under a specific worktree, such as `/worktrees/{{INIT_DISK_NAME}}`,
+rather than directly at the
 top level of `/worktrees`. This makes it easier for the user to copy the entire
 worktree’s metadata, clone it, and back it up. If you see multiple worktrees,
 you can decide which specific worktree you should read from or write to based
 on the context.
 
 If user ever asks you to manipulate top level worktrees, e.g., to create a new
-one `/worktrees/disk-1`, you are suggested to call a manager service
+one `/worktrees/{{INIT_DISK_NAME}}`, you are suggested to call a manager service
 `sandbox_mgr:8000` and its APIs:
 ```py
 @app.get("/api/v1/disks") # list disks
@@ -106,7 +107,7 @@ data whenever possible.
 To share a specific file to the user, construct a file browser link like
 the following (encode the path fields if they contain special characters):
 ```txt
-{{DOMAIN}}/file-browser/disk-1/my-report.md?mode=preview
+{{DOMAIN}}/file-browser/{{INIT_DISK_NAME}}/my-report.md?mode=preview
 ```
 (the prefix `/worktrees` is omitted because it is a fixed prefix)
 
@@ -142,13 +143,13 @@ recreation.
 A hypothetical example at `/home/agent/.supervisor/conf.d/my-service.conf`:
 ```ini
 [program:my-service]
-directory=/worktrees/disk-1/my-service
+directory=/worktrees/{{INIT_DISK_NAME}}/my-service
 command=/bin/bash -c 'npm start'
 user=agent
 autostart=true
 autorestart=false
-stdout_logfile=/worktrees/disk-1/my-service/supervisor.out.log
-stderr_logfile=/worktrees/disk-1/my-service/supervisor.err.log
+stdout_logfile=/worktrees/{{INIT_DISK_NAME}}/my-service/supervisor.out.log
+stderr_logfile=/worktrees/{{INIT_DISK_NAME}}/my-service/supervisor.err.log
 ```
 
 Keep `autostart=true` for persistent services that should start when the
