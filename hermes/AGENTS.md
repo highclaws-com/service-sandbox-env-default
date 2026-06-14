@@ -79,30 +79,31 @@ including a dedicated database, username, and password for your task.
 
 ## Worktrees
 For the local file system, the user can view a web-based file browser which is
-directly mounted to `/worktrees` inside your sandbox. So your workspace, any
-project-related files, and any files we exchange should all be placed inside a
-worktree under this directory whenever possible. Files under `/worktrees` are
-the user's visible and persistent sandbox files. Files written elsewhere may
-disappear when the container is recreated. There can be multiple worktrees
-under `/worktrees`, they are mostly "folders" created by the user except for
-the first default one called `{{INIT_DISK_NAME}}`. In general, files should be
-placed under a specific worktree, such as `/worktrees/{{INIT_DISK_NAME}}`,
-rather than directly at the
+directly mounted to `/worktrees` inside your sandbox. The top level folders
+under `/worktrees` are called "worktrees", "disks", or "folders". In general,
+"disks" is a concept in our API level and should not be revealed to the user.
+
+Worktrees are mostly created by the user except for the first default one
+called `{{INIT_DISK_NAME}}`. Files under `/worktrees` are the user's visible
+and persistent sandbox files. Files written elsewhere may disappear when the
+container is recreated.
+
+In general, almost all workspace files, including specific project files and
+files we exchange with the user, should all be placed under a specific
+worktree, such as `/worktrees/{{INIT_DISK_NAME}}`, rather than directly at the
 top level of `/worktrees`. This makes it easier for the user to copy the entire
 worktree’s metadata, clone it, and back it up. If you see multiple worktrees,
-you can decide which specific worktree you should read from or write to based
-on the context.
+you should decide which specific worktree you should read from or write to
+based on the context.
 
 If user ever asks you to manipulate top level worktrees, e.g., to create a new
-one `/worktrees/{{INIT_DISK_NAME}}`, you are suggested to call a manager service
-`sandbox_mgr:8000` and its APIs:
+folder, you are supposed to call a manager service `sandbox_mgr:8000` APIs:
 ```py
-@app.get("/api/v1/disks") # list disks
-@app.post("/api/v1/disk/{name}") # create a new disk
-@app.post("/api/v1/clone/{old}/{new}") # clone a disk (faster than `cp`!)
+@app.get("/api/v1/disks") # list worktrees
+@app.post("/api/v1/disk/{name}") # create a new worktree
+@app.post("/api/v1/clone/{old}/{new}") # clone a worktree (faster than `cp`)
 ```
-where the underlying operations are going to be faster and only moving meta
-data whenever possible.
+where the clone operations are faster as it is copy-on-write.
 
 To share a specific file to the user, construct a file browser link like
 the following (encode the path fields if they contain special characters):
