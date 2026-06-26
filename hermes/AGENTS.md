@@ -215,21 +215,42 @@ with Message API. Assuming the cloudflared output above, user should set the
 URL to `https://sells-cited-constitutes-execute.trycloudflare.com/line/webhook`
 
 ## Note on Scheduled Task Timezones
-The `cronjob` tool accepts several schedule forms:
+The `cronjob` tool accepts several schedule forms. Treat them differently:
 
-* `30m`, `2h`, `1d`: one-shot relative delay from now.
-* `every 30m`, `every 2h`: recurring interval.
-* `0 9 * * *`: recurring cron expression; use this for normal user-facing
-  schedules such as "every day at 9am".
-* `2026-06-27T09:00:00+08:00` or `2026-06-27T01:00:00Z`: one-shot ISO
-  timestamp.
+* `30m`, `2h`, `1d`: one-shot relative delay from now. No timezone conversion.
+* `every 30m`, `every 2h`: recurring interval. No timezone conversion.
+* `0 9 * * *`: recurring cron expression. Use this for normal user-facing
+  schedules such as "every day at 9am". No UTC conversion.
+* `2026-06-27T09:00:00+08:00`, `2026-06-27T09:00:00-04:00`, or
+  `2026-06-27T13:00:00Z`: one-shot ISO timestamp. This is the form where
+  timezone conversion or an explicit offset matters.
 
-The first three forms are expected to use the user's configured Hermes timezone.
-The ISO timestamp form is the one that needs extra care: when scheduling a
-user-facing local time, include the correct offset or UTC suffix based on the
-user's configured timezone. You can check it in `/home/agent/.hermes/config.yaml`
-under the `timezone` key. Do not emit a naive ISO timestamp when the user expects
-their local time.
+For relative delays, recurring intervals, and cron expressions, write the time
+exactly as the user says it in their configured Hermes timezone. If the user
+wants "every day at 8am", use `0 8 * * *`. Do not convert that to UTC. Hermes
+already interprets cron expressions in the configured Hermes timezone.
+
+Do not infer the user's timezone from `/etc/localtime`, `date`, the Docker
+container timezone, or the host OS. In this sandbox those often describe the
+runtime container, not the user's Hermes schedule timezone. The authoritative
+source is `/home/agent/.hermes/config.yaml` under the `timezone` key, plus the
+user's own instruction/memory.
+
+Avoid ISO timestamps for user-facing local schedules unless the user explicitly
+asks for a one-shot task at a specific date/time or an exact absolute instant.
+Prefer relative delays (`30m`, `2h`), recurring intervals (`every 30m`), or cron
+expressions (`0 9 * * *`) because those do not require manual timezone
+conversion.
+
+If you must use an ISO timestamp, it must include timezone information:
+
+* Local time with offset: `2026-06-27T08:00:00-04:00` means 8am in a UTC-4
+  timezone, such as Toronto/New York during daylight saving time.
+* UTC instant with `Z`: `2026-06-27T12:00:00Z` means 12:00 UTC, which is the
+  same instant as `2026-06-27T08:00:00-04:00`.
+* Do not use naive ISO timestamps like `2026-06-27T08:00:00` for user-facing
+  local times. They have no `Z` and no `+/-HH:MM` offset, so they can be
+  interpreted using the runtime environment rather than the user's expectation.
 
 ## Hermes and You
 The `/home/agent/hermes` has the exact Hermes source code serving this sandbox.
