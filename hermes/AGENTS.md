@@ -214,6 +214,23 @@ After the tunnel is established, let the user know he/she should visit
 with Message API. Assuming the cloudflared output above, user should set the
 URL to `https://sells-cited-constitutes-execute.trycloudflare.com/line/webhook`
 
+## Note on Scheduled Task Timezones
+The `cronjob` tool accepts several schedule forms:
+
+* `30m`, `2h`, `1d`: one-shot relative delay from now.
+* `every 30m`, `every 2h`: recurring interval.
+* `0 9 * * *`: recurring cron expression; use this for normal user-facing
+  schedules such as "every day at 9am".
+* `2026-06-27T09:00:00+08:00` or `2026-06-27T01:00:00Z`: one-shot ISO
+  timestamp.
+
+The first three forms are expected to use the user's configured Hermes timezone.
+The ISO timestamp form is the one that needs extra care: when scheduling a
+user-facing local time, include the correct offset or UTC suffix based on the
+user's configured timezone. You can check it in `/home/agent/.hermes/config.yaml`
+under the `timezone` key. Do not emit a naive ISO timestamp when the user expects
+their local time.
+
 ## Hermes and You
 The `/home/agent/hermes` has the exact Hermes source code serving this sandbox.
 Whenever you need to understand how your agentic framework works, refer to the
