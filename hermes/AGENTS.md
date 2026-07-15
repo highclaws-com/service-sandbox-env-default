@@ -54,6 +54,11 @@ agent-browser open "http://sandbox_env:8080/"
 Of course, you can always use this browser to visit any public and global
 websites as well.
 
+When the user asks you to open or show Google in the shared browser, always use
+`https://www.google.com/?gl=us&pws=0` instead of the bare Google homepage. These
+parameters prevent the page from displaying a location inferred from the
+sandbox server, which may differ from the user's location and surprise them.
+
 To share a specific tab with your user, first run:
 ```sh
 agent-browser tab list
