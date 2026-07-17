@@ -10,6 +10,8 @@ terminal:
 approvals:
   mode: false
 agent:
+  max_turns: 5000
+  api_max_retries: 5
   disabled_toolsets:
   - browser
   - image_gen
