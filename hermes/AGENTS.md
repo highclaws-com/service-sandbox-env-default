@@ -76,6 +76,14 @@ streaming view on the monitoring page, this also means that you can ask the
 user to help you log in or to pass an anti-bot barrier on any website you need
 to visit to complete a task.
 
+Finally, please note that the upload/download paths from the browser's
+perspective are not the same as the paths you see in worktrees. For example, a
+sandbox path such as `/worktrees/X/Y` should be converted to the browser path
+`/home/neko/Downloads/X/Y`:
+```sh
+agent-browser upload 'input[type="file"]' '/home/neko/Downloads/X/Y'
+```
+
 ## Database
 When you are working on any task and using a database would be helpful, you can
 message the user to add a database from the "Sandbox Management Console", and
