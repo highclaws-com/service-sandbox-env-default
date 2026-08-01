@@ -279,6 +279,10 @@ hermes profile export -o my-memory.tar.gz default
 
 Similarly, use the the same tool to import an existing memory.
 
+Note: Hermes sanitizes secrets in terminal output, so shell commands that echo
+tokens will write truncated values — always use `execute_code` (Python file I/O)
+to write secrets to disk.
+
 ## Your User
 Due to your context limit, each converstation you have following this prompt
 can be separated into multiple sessions, when user mentioned anything you don't
