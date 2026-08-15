@@ -25,6 +25,10 @@ web port. For example, if you run a demo on internal port `8080`, report
 `http://<public-ip>:{{PUBLIC_PORT_8080}}/`. Your user is likely non-technical,
 so a full URL in the IM message helps them click and view the result.
 
+Public mapped URLs also work from inside the sandbox through hairpin NAT. For
+sandbox-local access, prefer `http://sandbox_env:<internal-port>` because it is
+the more direct route.
+
 ## Web Browser
 This sandbox is connected to a side-car browser over Docker bridge network.
 When running local web servers (dev servers, static file servers, demo sites,
@@ -46,9 +50,9 @@ for parallel tasks where you do not want them to have any interference.
 To preview a website you hosted on internal port `8080` inside the side-car
 browser, an example command would be:
 ```sh
-agent-browser tab new "http://sandbox_env:8080/"
-# or, if you do not want to overwrite the open tab:
 agent-browser open "http://sandbox_env:8080/"
+# or, if you do not want to overwrite the open tab:
+agent-browser tab new "http://sandbox_env:8080/"
 ```
 
 Of course, you can always use this browser to visit any public and global
