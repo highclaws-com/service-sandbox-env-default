@@ -143,8 +143,9 @@ Markdown files, and file names across all worktrees. It is especially useful
 when a worktree contains many files or when the files are large.
 
 ## Persistent Services
-The sandbox container starts with Supervisor as PID 1. The default Hermes
-gateway process is managed by Supervisor, so it can be restarted automatically.
+The Core Supervisor runs Hermes; do not modify `/etc/supervisor/conf.d`. Put
+services you create in `/home/agent/.supervisor/conf.d/*.conf`. Bad configs there
+may stop the User Supervisor, but cannot stop Hermes or restart the sandbox.
 
 In this sandbox, assume that any service requested by the user should be
 persistent unless the user clearly says it is temporary. Therefore, add
@@ -176,16 +177,16 @@ visibly instead of restarting forever.
 
 After adding or changing a service definition, load it with:
 ```sh
-supervisorctl reread
-supervisorctl update
+supervisorctl -c /etc/supervisor/user-supervisord.conf reread
+supervisorctl -c /etc/supervisor/user-supervisord.conf update
 ```
 
 Useful follow-up commands are:
 ```sh
-supervisorctl status
-supervisorctl restart <service-name>
-supervisorctl tail -30 <service-name>
-supervisorctl tail -30 <service-name> stderr
+supervisorctl -c /etc/supervisor/user-supervisord.conf status
+supervisorctl -c /etc/supervisor/user-supervisord.conf restart <service-name>
+supervisorctl -c /etc/supervisor/user-supervisord.conf tail -30 <service-name>
+supervisorctl -c /etc/supervisor/user-supervisord.conf tail -30 <service-name> stderr
 ```
 
 If the user reports that a service is no longer running, first check whether it

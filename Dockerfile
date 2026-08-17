@@ -93,8 +93,10 @@ COPY --chown=agent:agent ./hermes/config.yaml /home/agent/.hermes/config.yaml
 
 # set up Supervisor
 USER root
-COPY supervisor/supervisord.conf /etc/supervisor/supervisord.conf
+COPY supervisor/core-supervisord.conf /etc/supervisor/core-supervisord.conf
+COPY supervisor/user-supervisord.conf /etc/supervisor/user-supervisord.conf
 COPY supervisor/conf.d/hermes.conf /etc/supervisor/conf.d/hermes.conf
+COPY supervisor/conf.d/start-user-supervisor.conf /etc/supervisor/conf.d/start-user-supervisor.conf
 COPY sandbox-entrypoint.sh /usr/local/bin/sandbox-entrypoint.sh
 RUN chmod 0755 /usr/local/bin/sandbox-entrypoint.sh && \
     mkdir -p /var/log/supervisor /home/agent/.supervisor/conf.d && \
@@ -102,4 +104,3 @@ RUN chmod 0755 /usr/local/bin/sandbox-entrypoint.sh && \
 
 WORKDIR /worktrees
 ENTRYPOINT ["/usr/local/bin/sandbox-entrypoint.sh"]
-CMD ["supervisord", "-c", "/etc/supervisor/supervisord.conf", "-n"]

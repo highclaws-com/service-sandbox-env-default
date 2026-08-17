@@ -32,4 +32,5 @@ for path in /worktrees /worktrees/* /worktrees/.[!.]* /worktrees/..?*; do
     chmod u+rwx "$path" || true
 done
 
-exec "$@"
+# Start the Core Supervisor as PID 1.
+exec /usr/bin/supervisord -c /etc/supervisor/core-supervisord.conf
