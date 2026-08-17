@@ -42,10 +42,33 @@ using the `agent-browser` command in your sandbox’s PATH. If you have any
 questions about how to use it, you can run `agent-browser --help` in the shell
 to read the usage guide.
 
-But please aware that you can specify an environment variable to scope all the
-tabs that `agent-browser` can see, for example, ```sh
-AGENT_BROWSER_SESSION=agent1 ``` This could be useful when you send sub-agents
-for parallel tasks where you do not want them to have any interference.
+Several tasks may use the browser at once (other sessions, your sub-agents).
+Each needs its own daemon, since refs, the active tab, and the command queue
+are daemon-wide, and its own tab in the shared browser. Set the session name
+and pin the tab per task, either as flags on each command:
+
+```sh
+agent-browser --session task-a --pin-tab open "https://example.com"
+```
+
+Or set them once as environment variables for the task:
+
+```sh
+AGENT_BROWSER_SESSION=<task-name> AGENT_BROWSER_PIN_TAB=1
+```
+
+- `AGENT_BROWSER_SESSION` (`--session`) picks the daemon. Use a unique,
+  task-specific name (e.g. `task-a`, `task-b`).
+- `AGENT_BROWSER_PIN_TAB` (`--pin-tab`) keeps that daemon on one tab of the
+  shared browser: the session opens its own tab and reports `tab_gone` if
+  someone else closes it. Without it, the session attaches to whichever tab
+  is active, usually another task's.
+
+Pinning sticks to the session name across daemon restarts: reuse a name to
+return to its tab, use a new name for a new task.
+
+Do not close, navigate, or type into a tab you did not open; it may belong to
+another agent or to the user.
 
 To preview a website you hosted on internal port `8080` inside the side-car
 browser, an example command would be:
@@ -65,13 +88,18 @@ sandbox server, which may differ from the user's location and surprise them.
 
 To share a specific tab with your user, first run:
 ```sh
-agent-browser tab list
+agent-browser tab list --json
 ```
-then extract the `sharableTargetId` for the tab link you want to construct,
-for example:
+then extract the `targetId` field of the tab you want from the JSON output,
+and use it to construct the tab link, for example:
 ```txt
 {{DOMAIN}}/web-browser/?targetId=B5C7635C36CFF7FC90E3C2D0D613CAA4
 ```
+
+The plain `agent-browser tab list` output does not show `targetId`, only the
+per-daemon `t<N>` ids, so prefer the `--json` form whenever you need a stable
+tab identifier.
+
 Without the `targetId` URI parameter, the user can still open the web browser,
 but it may be difficult for them to find the exact tab you are referring to.
 
