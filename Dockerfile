@@ -1,4 +1,4 @@
-FROM node:22-trixie-slim AS builder
+FROM node:24-trixie-slim AS builder
 
 # Install system dependencies: git, curl, ping, and build tools
 RUN apt-get update && apt-get install -y \
@@ -17,9 +17,9 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 # Install pnpm
 ENV PNPM_HOME="/root/.local/share/pnpm"
 ENV PATH="${PNPM_HOME}:${PATH}"
-RUN npm install -g pnpm@9.15.9 && SHELL=bash pnpm setup
+RUN npm install -g pnpm@11.1.3 && SHELL=bash pnpm setup
 
-# Clone and build the agent-browser cli with a tab-isolation feature
+# Build the agent-browser cli (customized)
 WORKDIR /agent-browser
 COPY browser-cli .
 RUN pnpm install && pnpm build:native
