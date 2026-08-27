@@ -13,6 +13,7 @@ chown agent:agent \
     /home/agent/.hermes/memories \
     /home/agent/.hermes/cron \
     /home/agent/.hermes/skills \
+    /home/agent/.hermes/profiles \
     /home/agent/.hermes/sessions \
     /home/agent/.hermes/state.* || true
 
