@@ -9,6 +9,8 @@ terminal:
   cwd: /home/agent
 approvals:
   mode: false
+security:
+  redact_secrets: false
 agent:
   max_turns: 5000
   api_max_retries: 5
