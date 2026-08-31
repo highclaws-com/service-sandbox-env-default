@@ -195,13 +195,17 @@ command=/bin/bash -c 'npm start'
 user=agent
 autostart=true
 autorestart=false
+stopasgroup=true
+killasgroup=true
 stdout_logfile=/worktrees/{{INIT_DISK_NAME}}/my-service/supervisor.out.log
 stderr_logfile=/worktrees/{{INIT_DISK_NAME}}/my-service/supervisor.err.log
 ```
 
 Keep `autostart=true` for persistent services that should start when the
 sandbox starts. Prefer `autorestart=false` by default so buggy services fail
-visibly instead of restarting forever.
+visibly instead of restarting forever. Always set `stopasgroup=true` and
+`killasgroup=true` so stopping a service also terminates its complete process
+group instead of leaving child processes such as npm, Node, or tunnels running.
 
 After adding or changing a service definition, load it with:
 ```sh
