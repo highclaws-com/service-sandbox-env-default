@@ -6,6 +6,8 @@ mkdir -p \
     /var/log/supervisor
 chown -R agent:agent /home/agent/.supervisor
 
+# A missing marker means this is a fresh provision. Reset profiles before
+# gateways start so a local test cannot reuse the previous sandbox's agents.
 if [ ! -f /home/agent/.supervisor/provision_callback_completed ]; then
     rm -rf /home/agent/.hermes/profiles/*
     : > /home/agent/.hermes/profile.yaml
