@@ -6,6 +6,11 @@ mkdir -p \
     /var/log/supervisor
 chown -R agent:agent /home/agent/.supervisor
 
+if [ ! -f /home/agent/.supervisor/provision_callback_completed ]; then
+    rm -rf /home/agent/.hermes/profiles/*
+    : > /home/agent/.hermes/profile.yaml
+fi
+
 # Do not use chown -R on /home/agent/.hermes. Persisted Hermes dirs can grow
 # large. Also, Docker creates missing bind-mount source dirs as root:root, so
 # fix the mountpoint directories Hermes need write to.
