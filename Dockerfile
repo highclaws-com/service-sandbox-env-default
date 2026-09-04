@@ -17,7 +17,7 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 # Install pnpm
 ENV PNPM_HOME="/root/.local/share/pnpm"
 ENV PATH="${PNPM_HOME}:${PATH}"
-RUN npm install -g pnpm@11.1.3 && SHELL=bash pnpm setup
+RUN npm install -g --no-audit --no-fund pnpm@11.1.3 && SHELL=bash pnpm setup
 
 # Build the agent-browser cli (customized)
 WORKDIR /agent-browser
@@ -55,14 +55,14 @@ RUN mkdir -p --mode=0755 /usr/share/keyrings && \
 # Install pnpm
 ENV PNPM_HOME="/root/.local/share/pnpm"
 ENV PATH="${PNPM_HOME}:${PATH}"
-RUN npm install -g pnpm@9.15.9 && rm -rf /root/.npm && SHELL=bash pnpm setup
+RUN npm install -g --no-audit --no-fund pnpm@9.15.9 && rm -rf /root/.npm && SHELL=bash pnpm setup
 
 # Only keep the rust build binary as requested
 COPY --from=builder /agent-browser/cli/target/release/agent-browser /usr/local/bin/agent-browser
 
 # Install search-cli
 COPY search-cli /opt/search-cli
-RUN cd /opt/search-cli/src && npm install \
+RUN cd /opt/search-cli/src && npm install --no-audit --no-fund \
     && rm -rf /root/.npm \
     && chmod +x search-cli.js \
     && ln -s /opt/search-cli/src/search-cli.js /usr/local/bin/search-cli
