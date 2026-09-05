@@ -88,8 +88,6 @@ RUN cd hermes && \
     bash -c "cp cli-config.yaml.example ~/.hermes/config.yaml.example" && \
     bash -c "cp .env.example ~/.hermes/.env.example"
 
-COPY --chown=agent:agent ./hermes/env /home/agent/.hermes/.env
-COPY --chown=agent:agent ./hermes/config.yaml /home/agent/.hermes/config.yaml
 COPY --chown=agent:agent ./hermes/hooks /home/agent/.hermes/hooks
 COPY --chown=agent:agent ./hermes/plugins /home/agent/.hermes/plugins
 
