@@ -90,6 +90,8 @@ RUN cd hermes && \
 
 COPY --chown=agent:agent ./hermes/env /home/agent/.hermes/.env
 COPY --chown=agent:agent ./hermes/config.yaml /home/agent/.hermes/config.yaml
+COPY --chown=agent:agent ./hermes/hooks /home/agent/.hermes/hooks
+COPY --chown=agent:agent ./hermes/plugins /home/agent/.hermes/plugins
 
 # set up Supervisor
 USER root

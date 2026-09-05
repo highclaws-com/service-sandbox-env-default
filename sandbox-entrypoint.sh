@@ -2,6 +2,7 @@
 set -eu
 
 mkdir -p \
+    /home/agent/.hermes/profiles \
     /home/agent/.supervisor/conf.d \
     /var/log/supervisor
 chown -R agent:agent /home/agent/.supervisor
@@ -17,6 +18,8 @@ fi
 # large. Also, Docker creates missing bind-mount source dirs as root:root, so
 # fix the mountpoint directories Hermes need write to.
 chown agent:agent \
+    /home/agent/.hermes/.env \
+    /home/agent/.hermes/config.yaml \
     /home/agent/.hermes/memories \
     /home/agent/.hermes/cron \
     /home/agent/.hermes/skills \
