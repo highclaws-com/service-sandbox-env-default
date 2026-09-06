@@ -101,6 +101,7 @@ COPY supervisor/conf.d/start-user-supervisor.conf /etc/supervisor/conf.d/start-u
 COPY sandbox-entrypoint.sh /usr/local/bin/sandbox-entrypoint.sh
 COPY start-crew-agents.sh /usr/local/bin/start-crew-agents.sh
 RUN chmod 0755 /usr/local/bin/sandbox-entrypoint.sh /usr/local/bin/start-crew-agents.sh && \
+    ln -sf /home/agent/.local/bin/hermes /usr/local/bin/hermes && \
     mkdir -p /var/log/supervisor /home/agent/.supervisor/conf.d && \
     chown -R agent:agent /home/agent/.supervisor
 
