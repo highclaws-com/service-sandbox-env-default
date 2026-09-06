@@ -67,6 +67,13 @@ AGENT_BROWSER_SESSION=<task-name> AGENT_BROWSER_PIN_TAB=1
 Pinning sticks to the session name across daemon restarts: reuse a name to
 return to its tab, use a new name for a new task.
 
+An inactive session may be reclaimed after several minutes. The timeout is set
+by `AGENT_BROWSER_IDLE_TIMEOUT_MS`. If a task needs to leave its session idle
+for longer, set a larger value before the first command that creates the
+session, for example `AGENT_BROWSER_IDLE_TIMEOUT_MS=1800000` for 30 minutes.
+If a later command finds that its session is gone, reconnect or recreate the
+same named session; this cleanup is expected and is not a browser failure.
+
 Do not close, navigate, or type into a tab you did not open; it may belong to
 another agent or to the user.
 
