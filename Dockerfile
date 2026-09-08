@@ -90,6 +90,7 @@ RUN cd hermes && \
 
 COPY --chown=agent:agent ./hermes/hooks /home/agent/.hermes/hooks
 COPY --chown=agent:agent ./hermes/plugins /home/agent/.hermes/plugins
+COPY --chown=agent:agent ./hermes/SOUL.md /home/agent/SOUL.init.md
 
 # set up Supervisor
 USER root
