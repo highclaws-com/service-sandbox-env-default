@@ -3,6 +3,8 @@ import os
 import asyncio
 from urllib import request
 
+from hermes_cli.profiles import get_active_profile_name
+
 URL = f"{os.environ.get('NOTIFICATION_BASE_URL', 'http://sandbox_event:8000')}/api/v1/event"
 
 
@@ -23,6 +25,7 @@ def _post_json(url: str, payload: dict) -> None:
 
 async def _post_thinking_async(session_id: str, thinking_log: list):
     payload = {
+        "profile": get_active_profile_name(),
         "event_type": "job:thinking",
         "context": {
             "session_id": session_id,

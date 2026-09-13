@@ -3,6 +3,8 @@ import json
 import os
 from urllib import request
 
+from hermes_cli.profiles import get_active_profile_name
+
 
 URL = f"{os.environ['NOTIFICATION_BASE_URL']}/api/v1/event"
 
@@ -21,7 +23,11 @@ def _post_json(url: str, payload: dict) -> None:
 
 
 async def handle(event_type: str, context: dict):
-    payload = {"event_type": event_type, "context": context}
+    payload = {
+        "profile": get_active_profile_name(),
+        "event_type": event_type,
+        "context": context,
+    }
     try:
         await asyncio.to_thread(_post_json, URL, payload)
     except Exception as exc:
