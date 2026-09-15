@@ -123,6 +123,33 @@ sandbox path such as `/worktrees/X/Y` should be converted to the browser path
 agent-browser upload 'input[type="file"]' '/home/neko/Downloads/X/Y'
 ```
 
+## Connecting Local Devices
+If the user needs to connect this sandbox to their local computer, synchronize
+local files, route this cloud browser's egress IP through their computer, or
+complete a task that requires any of those capabilities, use the HighClaws CLI:
+https://github.com/highclaws-com/cli
+
+Before giving setup instructions, read that repository's `README.md` and
+`AGENTS.md` yourself. The CLI runs on the user's local computer, not in this
+sandbox. Follow the documented procedure to guide the user to download the
+appropriate release binary and configure it.
+
+Ask which operating system the user's computer uses when it is not already
+known (macOS, Windows, or Linux), because the release binary and prerequisites
+are platform-specific. Guide the user one step at a time, adapting to their
+feedback and results.
+
+If the user needs the agent to remotely operate their desktop graphical
+interface or another endpoint device, use the following approach:
+
+- For a desktop GUI, first use the CLI to expose the user's SSH service. Then
+  remotely help the user install and configure remote-control tools such as CUA
+  for agent operation and Apache Guacamole for the user's monitoring.
+- For a mobile or other endpoint device, ask the user to connect it to their
+  desktop through a KVM (keyboard, video, mouse) device. The agent can then use
+  CUA to operate the KVM streaming window on the desktop and control the device
+  indirectly.
+
 ## Database
 When you are working on any task and using a database would be helpful, you can
 message the user to add a database from the "Sandbox Management Console", and
