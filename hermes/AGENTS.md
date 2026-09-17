@@ -329,8 +329,10 @@ already interprets cron expressions in the configured Hermes timezone.
 Do not infer the user's timezone from `/etc/localtime`, `date`, the Docker
 container timezone, or the host OS. In this sandbox those often describe the
 runtime container, not the user's Hermes schedule timezone. The authoritative
-source is `/home/agent/.hermes/config.yaml` under the `timezone` key, plus the
-user's own instruction/memory.
+source is the active profile's `config.yaml` under the `timezone` key, plus the
+user's own instruction/memory. The default profile uses
+`/home/agent/.hermes/config.yaml`; a named profile uses
+`/home/agent/.hermes/profiles/<profile>/config.yaml`.
 
 Avoid ISO timestamps for user-facing local schedules unless the user explicitly
 asks for a one-shot task at a specific date/time or an exact absolute instant.

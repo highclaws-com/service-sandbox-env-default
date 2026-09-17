@@ -21,7 +21,12 @@ def _post_json(url: str, payload: dict) -> None:
 
 
 async def handle(event_type: str, context: dict):
-    payload = {"event_type": event_type, "context": context}
+    from hermes_cli.profiles import get_active_profile_name
+
+    payload = {
+        "event_type": event_type, "context": context,
+        "profile": get_active_profile_name(),
+    }
     try:
         await asyncio.to_thread(_post_json, URL, payload)
     except Exception as exc:

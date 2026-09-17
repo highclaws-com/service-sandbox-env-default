@@ -22,7 +22,10 @@ def _post_json(url: str, payload: dict) -> None:
 
 
 async def _post_thinking_async(session_id: str, thinking_log: list):
+    from hermes_cli.profiles import get_active_profile_name
+
     payload = {
+        "profile": get_active_profile_name(),
         "event_type": "job:thinking",
         "context": {
             "session_id": session_id,
