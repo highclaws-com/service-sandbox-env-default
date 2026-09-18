@@ -71,3 +71,6 @@ platform_toolsets:
   - code_execution
   - delegation
   - vision
+stt:
+  # "" = auto-detect an input language, e.g., "en", "zh".
+  language: ''
