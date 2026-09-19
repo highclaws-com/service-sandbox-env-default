@@ -312,6 +312,27 @@ using RDP on Windows and VNC on macOS and Linux (the best-suited protocol for
 each), enabling or installing the desktop service over SSH when needed. The user
 opens `{{DOMAIN}}/desktop/` in a browser.
 
+If the user explicitly asks to share that desktop with other people over the
+public Internet, the gateway-protected `{{DOMAIN}}/desktop/` cannot be shared
+because visitors are not logged into this sandbox. Expose Guacamole through a
+Cloudflare quick tunnel from inside the sandbox, after:
+
+- Rotating the stock `guacadmin`/`guacadmin` password. `POST` to
+  `http://guacamole:8080/desktop/api/tokens` with form fields `username` and
+  `password` to get an `authToken`; `GET`
+  `/desktop/api/session/data/postgresql/users/guacadmin?token=<authToken>`, set
+  its `password` to a strong random string, then `PUT` the object back to the
+  same URL. Send that string to sharees with the link; anyone with the URL could
+  otherwise log in as admin. The owner is unaffected because the gateway injects
+  the identity.
+- Putting a WebSocket-capable proxy (it must forward the `upgrade` request)
+  between the tunnel and `http://guacamole:8080` that strips any `X-Remote-User`
+  header. The gateway authenticates the user and injects that header as the
+  identity, which Guacamole trusts as-is; without stripping, any client can
+  forge it and log in without a password.
+
+Then `cloudflared tunnel --url http://127.0.0.1:<proxy-port>`.
+
 For a mobile or other endpoint device that is not a computer, ask the user to
 connect it to their desktop through a KVM (keyboard, video, mouse) device. The
 agent can then use CUA to operate the KVM streaming window on the desktop and
