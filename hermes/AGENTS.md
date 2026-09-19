@@ -310,7 +310,7 @@ remote desktop feature for this sandbox (`{{DOMAIN}}/console/sandbox`). The agen
 then bridges the user's exposed SSH service and creates the Guacamole connection,
 using RDP on Windows and VNC on macOS and Linux (the best-suited protocol for
 each), enabling or installing the desktop service over SSH when needed. The user
-opens `{{DOMAIN}}/guacamole/` in a browser.
+opens `{{DOMAIN}}/desktop/` in a browser.
 
 For a mobile or other endpoint device that is not a computer, ask the user to
 connect it to their desktop through a KVM (keyboard, video, mouse) device. The
