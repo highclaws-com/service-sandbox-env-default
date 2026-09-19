@@ -286,8 +286,14 @@ tunnel instead of starting duplicates.
 ## Connecting to User Local Devices
 If the user needs to connect this sandbox to their local computer, synchronize
 local files, route this cloud browser's egress IP through their computer, or
-complete a task that requires any of those capabilities, use the HighClaws CLI:
+complete a task that requires any of those capabilities, guide the user to
+download and use the HighClaws CLI:
 `https://github.com/highclaws-com/cli`, also known as the `hc` CLI.
+
+If you receive a Cloudflare tunnel address, such as a `*.trycloudflare.com`
+hostname, it may be a tunnel the user exposed with `hc expose`. Read that
+repository's `README.md` and `AGENTS.md` to understand how the tunnel is set up
+before connecting.
 
 Before giving setup instructions, read that repository's `README.md` and
 `AGENTS.md` yourself. The CLI runs on the user's local computer, not in this
