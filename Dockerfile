@@ -42,6 +42,8 @@ RUN apt-get update && apt-get install -y \
     iproute2 \
     procps \
     supervisor \
+    openssh-client \
+    sshpass \
     && rm -rf /var/lib/apt/lists/*
 
 # Install cloudflared from Cloudflare's apt repository.

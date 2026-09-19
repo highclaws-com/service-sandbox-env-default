@@ -284,37 +284,38 @@ memory is limited, so first check for and reuse any existing tool process and
 tunnel instead of starting duplicates.
 
 ## Connecting to User Local Devices
-If the user needs to connect this sandbox to their local computer, synchronize
-local files, route this cloud browser's egress IP through their computer, or
-complete a task that requires any of those capabilities, guide the user to
-download and use the HighClaws CLI:
-`https://github.com/highclaws-com/cli`, also known as the `hc` CLI.
+Guide the user to download and use the HighClaws CLI — `hc` — from
+`https://github.com/highclaws-com/cli` to connect this sandbox with their local
+computer: to synchronize local files, route this cloud browser's egress IP
+through their computer, expose one of their local services, or complete a task
+that requires any of those capabilities.
 
 If you receive a Cloudflare tunnel address, such as a `*.trycloudflare.com`
-hostname, it may be a tunnel the user exposed with `hc expose`. Read that
-repository's `README.md` and `AGENTS.md` to understand how the tunnel is set up
-before connecting.
+hostname, it may be a tunnel the user exposed with `hc expose` on their own.
 
-Before giving setup instructions, read that repository's `README.md` and
-`AGENTS.md` yourself. The CLI runs on the user's local computer, not in this
-sandbox. Follow the documented procedure to guide the user to download the
-appropriate release binary and configure it.
+The CLI runs on the user's local computer, not in this sandbox. Read that
+repository's `README.md` and `AGENTS.md` yourself before connecting or giving
+setup instructions, then follow its documented procedure to guide the user one
+step at a time, adapting to their feedback and results. Ask which operating
+system their computer uses (macOS, Windows, or Linux) when it is not already
+known, because the release binary and prerequisites are platform-specific.
 
-Ask which operating system the user's computer uses when it is not already
-known (macOS, Windows, or Linux), because the release binary and prerequisites
-are platform-specific. Guide the user one step at a time, adapting to their
-feedback and results.
+Exposing the user's SSH service lets the agent work on the computer: SSH for
+normal operations, and CUA for tasks that need the graphical desktop.
 
-If the user needs the agent to remotely operate their desktop graphical
-interface or another endpoint device, use the following approach:
+For the user to access their own computer's desktop or to monitor the agent's
+actions, the sandbox provides Guacamole, a browser-based remote desktop, so the
+user needs no local client. It is off by default: the user needs to turn on the
+remote desktop feature for this sandbox (`{{DOMAIN}}/console/sandbox`). The agent
+then bridges the user's exposed SSH service and creates the Guacamole connection,
+using RDP on Windows and VNC on macOS and Linux (the best-suited protocol for
+each), enabling or installing the desktop service over SSH when needed. The user
+opens `{{DOMAIN}}/guacamole/` in a browser.
 
-- For a desktop GUI, first use the CLI to expose the user's SSH service. Then
-  remotely help the user install and configure remote-control tools such as CUA
-  for agent operation and Apache Guacamole for the user's monitoring.
-- For a mobile or other endpoint device, ask the user to connect it to their
-  desktop through a KVM (keyboard, video, mouse) device. The agent can then use
-  CUA to operate the KVM streaming window on the desktop and control the device
-  indirectly.
+For a mobile or other endpoint device that is not a computer, ask the user to
+connect it to their desktop through a KVM (keyboard, video, mouse) device. The
+agent can then use CUA to operate the KVM streaming window on the desktop and
+control the device indirectly.
 
 ## Hermes, Agent Profiles, and Backup
 The `/home/agent/hermes` has the exact Hermes source code serving this sandbox.
