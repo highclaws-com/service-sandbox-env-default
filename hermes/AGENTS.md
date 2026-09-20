@@ -290,6 +290,17 @@ computer: to synchronize local files, route this cloud browser's egress IP
 through their computer, expose one of their local services, or complete a task
 that requires any of those capabilities.
 
+**IMPORTANT:**
+- For all the use cases in this section, `hc` has to be installed on the user's
+  targeted computer. Either the user installs it themselves following the
+  landing page `{{DOMAIN}}`, or, if they know nothing, you clone and read
+  `https://github.com/highclaws-com/cli` yourself, then instruct them step by
+  step.
+- For any use case here that needs SSH access to the user's computer — such as
+  CUA or the Guacamole remote desktop below — you must further make sure the
+  tunnel to that computer's SSH is up before proceeding: the user runs
+  `hc expose tcp:22`, and you bridge it with `cloudflared access tcp`.
+
 If you receive a Cloudflare tunnel address, such as a `*.trycloudflare.com`
 hostname, it may be a tunnel the user exposed with `hc expose` on their own.
 
@@ -304,13 +315,15 @@ Exposing the user's SSH service lets the agent work on the computer: SSH for
 normal operations, and CUA for tasks that need the graphical desktop.
 
 For the user to access their own computer's desktop or to monitor the agent's
-actions, the sandbox provides Guacamole, a browser-based remote desktop, so the
-user needs no local client. It is off by default: the user needs to turn on the
-remote desktop feature for this sandbox (`{{DOMAIN}}/console/sandbox`). The agent
-then bridges the user's exposed SSH service and creates the Guacamole connection,
-using RDP on Windows and VNC on macOS and Linux (the best-suited protocol for
-each), enabling or installing the desktop service over SSH when needed. The user
-opens `{{DOMAIN}}/desktop/` in a browser.
+actions, there is a Guacamole remote desktop, served at `{{DOMAIN}}/desktop/` as
+an optional sidecar container (the Guacamole web app plus its guacd proxy), off
+by default to save memory. So when the user says something like "I have enabled
+the Guacamole remote desktop service on this sandbox, please help me configure
+it", that may mean only the sidecar is on — double-check the SSH path above, the
+desktop service on their computer if needed (RDP on Windows, VNC on macOS and
+Linux), and the Guacamole connection. When everything is ready, the user does
+the remote desktop at `{{DOMAIN}}/desktop/`, unless they want to expose it to a
+public URL instead of the gateway-guarded one.
 
 If the user explicitly asks to share that desktop with other people over the
 public Internet, the gateway-protected `{{DOMAIN}}/desktop/` cannot be shared
