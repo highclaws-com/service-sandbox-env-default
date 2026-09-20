@@ -23,6 +23,8 @@ agent:
   - clarify
   - homeassistant
   - kanban
+goals:
+  max_turns: 5000
 model:
   #default: minimax/minimax-m2.5:free
   #api_key: vk-openrouter
