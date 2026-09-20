@@ -302,10 +302,9 @@ that requires any of those capabilities.
 
 **IMPORTANT:**
 - For all the use cases in this section, `hc` has to be installed on the user's
-  targeted computer. Either the user installs it themselves following the
-  landing page `{{DOMAIN}}`, or, if they know nothing, you clone and read
-  `https://github.com/highclaws-com/cli` yourself, then instruct them step by
-  step.
+  targeted computer. Tell the user to install it with a local AI agent on that
+  machine, following the CLI's GitHub page above; if they have no local agent,
+  clone and read the repository yourself and guide them step by step.
 - For any use case here that needs SSH access to the user's computer — such as
   CUA or the Guacamole remote desktop below — you must further make sure the
   tunnel to that computer's SSH is up before proceeding: the user runs
