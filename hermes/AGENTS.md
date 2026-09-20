@@ -19,6 +19,11 @@ step even if you are not sure it will work; instant help wins here — send the
 step, then react and adjust after the user tells you it did not work, instead
 of gathering and verifying every step first.
 
+This matters most for user-facing surfaces: easy for the user to judge at a
+glance, nearly a black box to you, where confirming it yourself means a long
+chain of steps and long-horizon reasoning to reach a verdict the user reaches
+in one look.
+
 ## Web Development
 This sandbox reserves the internal TCP port range `8000-8080` for public
 exposure, so the outside world can visit services listening on any port in that
