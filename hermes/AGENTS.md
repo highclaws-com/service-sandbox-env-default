@@ -58,7 +58,7 @@ the `sandbox_env` hostname instead of `localhost`. From the browser’s perspect
 the sandbox is reachable at the hostname `sandbox_env`, not `localhost` or `127.0.0.1`.
 
 Both you and the user can see this browser. The user can watch it through a
-WebRTC monitoring webpage, at `{{DOMAIN}}/web-browser/` while you can access it
+WebRTC monitoring webpage, at `{{SANDBOX_ROOT_URL}}/web-browser/` while you can access it
 using the `agent-browser` command in your sandbox’s PATH. If you have any
 questions about how to use it, you can run `agent-browser --help` in the shell
 to read the usage guide.
@@ -121,7 +121,7 @@ agent-browser tab list --json
 then extract the `targetId` field of the tab you want from the JSON output,
 and use it to construct the tab link, for example:
 ```txt
-{{DOMAIN}}/web-browser/?targetId=B5C7635C36CFF7FC90E3C2D0D613CAA4
+{{SANDBOX_ROOT_URL}}/web-browser/?targetId=B5C7635C36CFF7FC90E3C2D0D613CAA4
 ```
 
 The plain `agent-browser tab list` output does not show `targetId`, only the
@@ -181,14 +181,14 @@ where the clone operations are faster as it is copy-on-write.
 To share a specific file to the user, construct a file browser link like
 the following (encode the path fields if they contain special characters):
 ```txt
-{{DOMAIN}}/file-browser/{{INIT_DISK_NAME}}/my-report.md?mode=preview
+{{SANDBOX_ROOT_URL}}/file-browser/{{INIT_DISK_NAME}}/my-report.md?mode=preview
 ```
 (the prefix `/worktrees` is omitted because it is a fixed prefix)
 
 ## Local File Search
 To make it easier for you and the user to search against existing local files,
 there is a fully fledged hybrid search engine that both of you can use:
-* The user can see the search bar on `{{DOMAIN}}/file-browser/` which is simply a
+* The user can see the search bar on `{{SANDBOX_ROOT_URL}}/file-browser/` which is simply a
 component embedded in the web-based file browser that the user interacts with.
 * You can access to the search engine via a command named `search-cli` in your
 PATH. Just like agent-browser, you can read its command-line help to learn how
@@ -335,18 +335,18 @@ Exposing the user's SSH service lets the agent work on the computer: SSH for
 normal operations, and CUA for tasks that need the graphical desktop.
 
 For the user to access their own computer's desktop or to monitor the agent's
-actions, there is a Guacamole remote desktop, served at `{{DOMAIN}}/desktop/` as
+actions, there is a Guacamole remote desktop, served at `{{SANDBOX_ROOT_URL}}/desktop/` as
 an optional sidecar container (the Guacamole web app plus its guacd proxy), off
 by default to save memory. So when the user says something like "I have enabled
 the Guacamole remote desktop service on this sandbox, please help me configure
 it", that may mean only the sidecar is on — double-check the SSH path above, the
 desktop service on their computer if needed (RDP on Windows, VNC on macOS and
 Linux), and the Guacamole connection. When everything is ready, the user does
-the remote desktop at `{{DOMAIN}}/desktop/`, unless they want to expose it to a
+the remote desktop at `{{SANDBOX_ROOT_URL}}/desktop/`, unless they want to expose it to a
 public URL instead of the gateway-guarded one.
 
 If the user explicitly asks to share that desktop with other people over the
-public Internet, the gateway-protected `{{DOMAIN}}/desktop/` cannot be shared
+public Internet, the gateway-protected `{{SANDBOX_ROOT_URL}}/desktop/` cannot be shared
 because visitors are not logged into this sandbox. Expose Guacamole through a
 Cloudflare quick tunnel from inside the sandbox, after:
 
