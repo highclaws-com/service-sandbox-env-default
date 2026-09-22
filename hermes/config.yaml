@@ -61,6 +61,7 @@ discord:
   auto_thread: false
   require_mention: true
   thread_require_mention: false
+  allow_bots: mentions
 group_sessions_per_user: false
 platform_toolsets:
   api_server:
