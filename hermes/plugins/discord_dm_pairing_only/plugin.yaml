@@ -1,0 +1,3 @@
+name: discord_dm_pairing_only
+description: Silences authorized Discord DMs while preserving stranger pairing
+version: 1.0.0

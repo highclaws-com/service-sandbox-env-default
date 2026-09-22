@@ -56,8 +56,11 @@ hooks_auto_accept: true
 plugins:
   enabled:
     - cron_capture
+    - discord_dm_pairing_only
 discord:
-  auto_thread: true
+  auto_thread: false
+  require_mention: true
+  thread_require_mention: false
 group_sessions_per_user: false
 platform_toolsets:
   api_server:
