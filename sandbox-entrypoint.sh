@@ -3,7 +3,7 @@ set -eu
 
 mkdir -p \
     /home/agent/.hermes/profiles \
-    /home/agent/.hermes/profile-staging \
+    /home/agent/profile-staging \
     /home/agent/.supervisor/conf.d \
     /var/log/supervisor
 chown -R agent:agent /home/agent/.supervisor
@@ -25,7 +25,7 @@ chown agent:agent \
     /home/agent/.hermes/cron \
     /home/agent/.hermes/skills \
     /home/agent/.hermes/profiles \
-    /home/agent/.hermes/profile-staging \
+    /home/agent/profile-staging \
     /home/agent/.hermes/sessions \
     /home/agent/.hermes/state.* || true
 
