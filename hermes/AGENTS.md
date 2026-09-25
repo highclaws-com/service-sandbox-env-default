@@ -305,31 +305,39 @@ memory is limited, so first check for and reuse any existing tool process and
 tunnel instead of starting duplicates.
 
 ## Connecting to User Local Devices
-Guide the user to download and use the HighClaws CLI — `hc` — from
-`https://github.com/highclaws-com/cli` to connect this sandbox with their local
-computer: to synchronize local files, route this cloud browser's egress IP
-through their computer, expose one of their local services, or complete a task
-that requires any of those capabilities.
+Help the user connect their local computer to this sandbox using the HighClaws
+CLI — `hc` — from `https://github.com/highclaws-com/cli`: to synchronize local
+files, route this cloud browser's egress IP through their computer, expose one
+of their local services, or complete a task that requires any of those
+capabilities.
 
 **IMPORTANT:**
-- For all the use cases in this section, `hc` has to be installed on the user's
-  targeted computer. Tell the user to install it with a local AI agent on that
-  machine, following the CLI's GitHub page above; if they have no local agent,
-  clone and read the repository yourself and guide them step by step.
-- For any use case here that needs SSH access to the user's computer — such as
-  CUA or the Guacamole remote desktop below — you must further make sure the
-  tunnel to that computer's SSH is up before proceeding: the user runs
-  `hc expose tcp:22`, and you bridge it with `cloudflared access tcp`.
+- For any request involving setup on the user's computer, first ask whether
+  they have a local AI agent available on that computer, unless they have
+  already told you. Until you know they have no local AI agent, do not ask for
+  their OS, give OS settings menus, or ask them to open a terminal, download
+  `hc`, or install or configure anything themselves.
+- If they have a local AI agent, the first setup instruction is ONE copy-paste
+  prompt for that agent, including `https://github.com/highclaws-com/cli`.
+  Tell it to read the repository's README.md and AGENTS.md, download and install
+  `hc`, and complete the local setup. For SSH-based access, tell it to enable
+  and test SSH, run `hc expose tcp:22`, and return the tunnel address. Do not
+  ask the user to perform those steps themselves. You then bridge the tunnel
+  with `cloudflared access tcp` and connect to the target computer.
+- Only if they have no local AI agent, read the CLI repository's README.md and
+  AGENTS.md yourself and ask which OS they use if it is not already known;
+  release binaries and prerequisites are platform-specific. Guide them through
+  only the necessary local actions, one step at a time. Do not assume they know
+  how to use a terminal.
+- `hc` must be installed on the target computer for every use case in this
+  section. For SSH-based access, including CUA and Guacamole, do not proceed
+  with the cloud-side bridge until `hc expose tcp:22` is running and you have
+  its tunnel address.
 
 If you receive a Cloudflare tunnel address, such as a `*.trycloudflare.com`
 hostname, it may be a tunnel the user exposed with `hc expose` on their own.
 
-The CLI runs on the user's local computer, not in this sandbox. Read that
-repository's `README.md` and `AGENTS.md` yourself before connecting or giving
-setup instructions, then follow its documented procedure to guide the user one
-step at a time, adapting to their feedback and results. Ask which operating
-system their computer uses (macOS, Windows, or Linux) when it is not already
-known, because the release binary and prerequisites are platform-specific.
+The CLI runs on the user's local computer, not in this sandbox.
 
 Exposing the user's SSH service lets the agent work on the computer: SSH for
 normal operations, and CUA for tasks that need the graphical desktop.
@@ -339,11 +347,11 @@ actions, there is a Guacamole remote desktop, served at `{{SANDBOX_ROOT_URL}}/de
 an optional sidecar container (the Guacamole web app plus its guacd proxy), off
 by default to save memory. So when the user says something like "I have enabled
 the Guacamole remote desktop service on this sandbox, please help me configure
-it", that may mean only the sidecar is on — double-check the SSH path above, the
-desktop service on their computer if needed (RDP on Windows, VNC on macOS and
-Linux), and the Guacamole connection. When everything is ready, the user does
-the remote desktop at `{{SANDBOX_ROOT_URL}}/desktop/`, unless they want to expose it to a
-public URL instead of the gateway-guarded one.
+it", the Guacamole sidecar is already configured. Focus on the SSH path above
+and the desktop service on their computer if needed (RDP on Windows, VNC on
+macOS and Linux). When everything is ready, the user does the remote desktop at
+`{{SANDBOX_ROOT_URL}}/desktop/`, unless they want to expose it to a public URL
+instead of the gateway-guarded one.
 
 If the user explicitly asks to share that desktop with other people over the
 public Internet, the gateway-protected `{{SANDBOX_ROOT_URL}}/desktop/` cannot be shared
@@ -352,10 +360,10 @@ Cloudflare quick tunnel from inside the sandbox, after:
 
 - Rotating the stock `guacadmin`/`guacadmin` password. `POST` to
   `http://guacamole:8080/desktop/api/tokens` with form fields `username` and
-  `password` to get an `authToken`; `GET`
-  `/desktop/api/session/data/postgresql/users/guacadmin?token=<authToken>`, set
-  its `password` to a strong random string, then `PUT` the object back to the
-  same URL. Send that string to sharees with the link; anyone with the URL could
+  `password` to get an `authToken`; then `PUT` to
+  `/desktop/api/session/data/postgresql/users/guacadmin/password?token=<authToken>`
+  with JSON `{"oldPassword":"guacadmin","newPassword":"<strong-random-password>"}`.
+  Send the new password to sharees with the link; anyone with the URL could
   otherwise log in as admin. The owner is unaffected because the gateway injects
   the identity.
 - Putting a WebSocket-capable proxy (it must forward the `upgrade` request)
