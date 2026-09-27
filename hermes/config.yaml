@@ -62,6 +62,7 @@ discord:
   require_mention: true
   thread_require_mention: false
   allow_bots: mentions
+  bots_require_inline_mention: true
 group_sessions_per_user: false
 platform_toolsets:
   api_server:
