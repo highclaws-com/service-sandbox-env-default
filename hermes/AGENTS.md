@@ -379,7 +379,7 @@ connect it to their desktop through a KVM (keyboard, video, mouse) device. The
 agent can then use CUA to operate the KVM streaming window on the desktop and
 control the device indirectly.
 
-## Hermes, Agent Profiles, and Backup
+## Hermes, Agent Profiles, and Backup-Restore
 The `/home/agent/hermes` has the exact Hermes source code serving this sandbox.
 Whenever you need to understand how your agentic framework works, refer to the
 source code.
@@ -403,18 +403,26 @@ with that profile's own tools:
 hermes -p <profile-id> chat -q "Set a reminder for one minute from now: buy groceries"
 ```
 
-When a user asks you to back up or export your profile, memory, identity, soul,
-or scheduled tasks, use the Hermes profile tool to generate a complete backup:
+To backup, use `hermes backup`, not `hermes profile export` — profile exports
+cannot fully restore the default agent. Save into an existing user-visible
+worktree so the sandbox backup system includes it and the user can confirm it
+in the file browser (`folder-1` is an example):
 ```sh
-hermes profile export -o my-memory.tar.gz default
+hermes backup -o /worktrees/folder-1/hermes-backups/
 ```
-(assuming the "default" probile)
 
-Similarly, use the the same tool to import an existing memory.
-
-Note: Hermes sanitizes secrets in terminal output, so shell commands that echo
-tokens will write truncated values — always use `execute_code` (Python file I/O)
-to write secrets to disk.
+On a **new sandbox**, use `hermes import`, not `hermes profile import`, to restore:
+```sh
+live=$(mktemp -d)
+for file in config.yaml .env auth.json; do
+  [ -f "$HOME/.hermes/$file" ] && cp -a "$HOME/.hermes/$file" "$live/"
+done
+hermes import --force /worktrees/folder-1/hermes-backups/ACTUAL-BACKUP-FILENAME.zip
+for file in config.yaml .env auth.json; do
+  [ -f "$live/$file" ] && cp -a "$live/$file" "$HOME/.hermes/"
+done
+rm -r "$live"
+```
 
 ## Note on Scheduled Task Timezones
 The `cronjob` tool accepts several schedule forms. Treat them differently:
