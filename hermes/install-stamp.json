@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 2,
+  "commit": "370be9a6e623140e795873316dc1b897ccba2241",
+  "baseVersion": "0.21.5",
+  "distance": 4160,
+  "displayVersion": "0.21.5+4160.hermes-highclaws-br-2026-0928",
+  "source": "docker",
+  "distribution": "docker",
+  "updateMechanism": "external"
+}

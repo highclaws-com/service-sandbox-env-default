@@ -15,3 +15,23 @@
 **/*.swo
 **/.DS_Store
 **/Thumbs.db
+
+# Local Python environments.
+**/.venv
+**/venv
+
+# Upstream frontend sources and bundles; shared Python backends remain.
+hermes/fork/apps
+hermes/fork/web
+hermes/fork/ui-tui
+hermes/fork/hermes_cli/web_dist
+hermes/fork/hermes_cli/tui_dist
+
+# Upstream test and evaluation suites.
+hermes/fork/tests
+hermes/fork/tests-js
+hermes/fork/evals
+
+# Keep the bundled model catalog used by the runtime, not the docs website.
+hermes/fork/website
+!hermes/fork/website/static/api/model-catalog.json

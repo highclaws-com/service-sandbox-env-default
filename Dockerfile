@@ -24,7 +24,10 @@ WORKDIR /agent-browser
 COPY browser-cli .
 RUN pnpm install && pnpm build:native
 
-FROM node:22-trixie-slim
+FROM node:22-trixie-slim AS node-runtime
+
+FROM python:3.14.7-slim-trixie
+COPY --from=node-runtime /usr/local/ /usr/local/
 
 # Install system dependencies and frequent tools available to AI agents.
 RUN apt-get update && apt-get install -y \
@@ -32,13 +35,10 @@ RUN apt-get update && apt-get install -y \
     curl \
     ca-certificates \
     iputils-ping \
-    python3 \
-    python3-pip \
     postgresql-client \
     wget \
     sudo \
     ripgrep \
-    python3-venv \
     iproute2 \
     procps \
     supervisor \
@@ -69,10 +69,9 @@ RUN cd /opt/search-cli/src && npm install --no-audit --no-fund \
     && chmod +x search-cli.js \
     && ln -s /opt/search-cli/src/search-cli.js /usr/local/bin/search-cli
 
-# Rename the base node user so host UID/GID 1000 bind mounts resolve to agent.
-RUN groupmod -n agent node && \
-    usermod -l agent -d /home/agent -m node && \
-    usermod -s /bin/bash agent && \
+# Create the agent user so host UID/GID 1000 bind mounts resolve to agent.
+RUN groupadd --gid 1000 agent && \
+    useradd --uid 1000 --gid agent --create-home --shell /bin/bash agent && \
     usermod -aG sudo agent && \
     echo "agent ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/agent && \
     chmod 0440 /etc/sudoers.d/agent && \
@@ -84,6 +83,7 @@ WORKDIR /home/agent
 # set up Hermes
 ENV PATH="/home/agent/.local/bin:${PATH}"
 COPY --chown=agent:agent ./hermes/fork /home/agent/hermes
+COPY --chown=agent:agent ./hermes/install-stamp.json /home/agent/hermes/install-stamp.json
 RUN cd hermes && \
     pip install --no-cache-dir -e ".[cli,messaging,cron,pty,feishu]" "websockets==15.0.1" --break-system-packages && \
     bash -c "mkdir -p ~/.hermes/{cron,sessions,logs,memories,skills}" && \
