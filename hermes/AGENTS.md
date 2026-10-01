@@ -52,6 +52,9 @@ the more direct route.
 
 ## Web Browser
 This sandbox is connected to a side-car browser over Docker bridge network.
+The browser runs in the `web_browser` service, a sidecar container to your
+agent container. `agent-browser` connects to it at `$AGENT_BROWSER_CDP`.
+
 When running local web servers (dev servers, static file servers, demo sites,
 etc.) inside the sandbox, you can debug or preview them in the browser using
 the `sandbox_env` hostname instead of `localhost`. From the browser’s perspective,
@@ -185,6 +188,12 @@ the following (encode the path fields if they contain special characters):
 ```
 (the prefix `/worktrees` is omitted because it is a fixed prefix)
 
+## Sandbox Management API
+The sandbox management API at `http://sandbox_mgr:8000` runs the same
+operations as the user's Sandbox Management Console: worktrees, databases,
+browser, etc. It is a FastAPI service; read its spec at
+`http://sandbox_mgr:8000/openapi.json`.
+
 ## Local File Search
 To make it easier for you and the user to search against existing local files,
 there is a fully fledged hybrid search engine that both of you can use:
@@ -307,7 +316,7 @@ tunnel instead of starting duplicates.
 ## Connecting to User Local Devices
 Help the user connect their local computer to this sandbox using the HighClaws
 CLI — `hc` — from `https://github.com/highclaws-com/cli`: to synchronize local
-files, route this cloud browser's egress IP through their computer, expose one
+files, run the egress proxy on their computer, expose one
 of their local services, or complete a task that requires any of those
 capabilities.
 
@@ -338,6 +347,18 @@ If you receive a Cloudflare tunnel address, such as a `*.trycloudflare.com`
 hostname, it may be a tunnel the user exposed with `hc expose` on their own.
 
 The CLI runs on the user's local computer, not in this sandbox.
+
+The egress proxy is a SOCKS5 proxy reached over WireGuard. When it is on, the
+sidecar browser sends ALL its traffic through it. It is also reachable in your
+sandbox environment at `$SANDBOX_EGRESS_PROXY_URL`.
+```sh
+curl --proxy "$SANDBOX_EGRESS_PROXY_URL" https://example.com
+```
+To check the state:
+- `GET http://sandbox_mgr:8000/api/v1/browser/egress-switch`: `enabled` is
+  true when the egress proxy is on.
+- `GET http://sandbox_mgr:8000/api/v1/browser/egress-connect`: `healthy` is
+  true when the egress proxy is reachable.
 
 Exposing the user's SSH service lets the agent work on the computer: SSH for
 normal operations, and CUA for tasks that need the graphical desktop.
