@@ -50,6 +50,16 @@ Public mapped URLs also work from inside the sandbox through hairpin NAT. For
 sandbox-local access, prefer `http://sandbox_env:<internal-port>` because it is
 the more direct route.
 
+## Sandbox Home Page
+`{{SANDBOX_ROOT_URL}}/` is the user's private home page, open only to the
+logged-in user. It is forwarded to the hard-coded port `8089` of this sandbox,
+where nothing runs by default. Think of it as the user's own room: they decide
+how to furnish it, in whatever style they like, so it reflects who they are.
+Help them decorate it exactly the way they want it.
+
+`/home/agent/home-ui-demo/index.html` demonstrates the service APIs. Use it as
+a code reference; build the page with any framework or language.
+
 ## Web Browser
 This sandbox is connected to a side-car browser over Docker bridge network.
 The browser runs in the `web_browser` service, a sidecar container to your

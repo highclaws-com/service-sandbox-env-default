@@ -100,6 +100,7 @@ COPY supervisor/core-supervisord.conf /etc/supervisor/core-supervisord.conf
 COPY supervisor/user-supervisord.conf /etc/supervisor/user-supervisord.conf
 COPY supervisor/conf.d/hermes.conf /etc/supervisor/conf.d/hermes.conf
 COPY supervisor/conf.d/start-user-supervisor.conf /etc/supervisor/conf.d/start-user-supervisor.conf
+COPY --chown=agent:agent home-ui-demo /home/agent/home-ui-demo
 COPY sandbox-entrypoint.sh /usr/local/bin/sandbox-entrypoint.sh
 RUN chmod 0755 /usr/local/bin/sandbox-entrypoint.sh && \
     ln -sf /home/agent/.local/bin/hermes /usr/local/bin/hermes && \

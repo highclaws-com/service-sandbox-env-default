@@ -1,0 +1,253 @@
+<!doctype html>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width">
+<title>Chat</title>
+<style>
+  #loading span {
+    display: inline-block; overflow: hidden; vertical-align: bottom;
+    width: 0; animation: dots 1.2s steps(4, end) infinite;
+  }
+  @keyframes dots { to { width: 1em; } }
+</style>
+
+<h1>Sandbox interface demo</h1>
+
+<h2>Browser stream</h2>
+<button type="button" id="open-tab">Open Google in a new tab</button>
+<!-- Shared browser stream URI; keep unchanged. Shows the active tab.
+     cast=1 is watch-only; mute_chat=1 disables chat sounds. -->
+<iframe src="/web-browser-webrtc/?cast=1&mute_chat=1"
+  width="640" height="480"></iframe>
+<hr>
+
+<h2>File access</h2>
+<!-- File preview uses /file-browser/ and ?mode=preview; keep these unchanged.
+     folder-1/picture.png is a mock path: use one that exists. -->
+<p>Example file: /worktrees/folder-1/picture.png</p>
+<a href="/file-browser/folder-1/picture.png?mode=preview"
+  target="_blank">Open file preview</a>
+<button type="button" id="fetch-file">Fetch image content</button>
+<div><img id="fetched-image" width="320" hidden></div>
+<hr>
+
+<h2>Agent chat</h2>
+<label>Agent <select id="profile"></select></label>
+<label>Session <select id="session"></select></label>
+<button id="new">New chat</button>
+<ul id="log"></ul>
+<p id="loading" hidden>Working<span>...</span></p>
+<h3>Send a message or attach a file</h3>
+<form id="form">
+  <input id="file" type="file">
+  <textarea id="text" rows="3" cols="60"></textarea>
+  <button>Send</button>
+</form>
+
+<script>
+// Hermes API key configured for this sandbox; keep it unchanged.
+// Central gateway verifies the visitor's JWT uid matches the sandbox owner.
+const KEY = 'hermes-api-server-key';
+const $ = (id) => document.getElementById(id);
+let sessionId = null;
+
+// Shared browser API (uses Chrome DevTools Protocol underneath).
+// Base URI: /web-browser/api; keep it unchanged. POST bodies are JSON.
+// GET  /config                -> {streamUrl}
+// GET  /stream-status         -> {streaming, error?}
+// GET  /tabs                  -> [{id, title, url, faviconUrl, type, visible}]
+// POST /new-tab               {url, colorScheme, language} -> {status, id}
+// POST /switch-tab/<id>       -> {status}; activates the tab shown in the stream
+// POST /close-tab/<id>        -> {status}
+// POST /back[/<id>]           -> {status}
+// POST /forward[/<id>]        -> {status}
+// POST /reload[/<id>]         -> {status}
+// POST /type[/<id>]           {text} -> {status}
+// POST /key[/<id>]            {key} -> {status}
+// POST /color-scheme          {scheme, reloadTargetId?} -> {status, scheme, results}
+// POST /language              {language, reloadTargetId?} -> {status, language,
+//                             locale, acceptLanguage, results}
+// colorScheme/scheme: light or dark. language: en-US, de-DE, fr-FR, zh-CN,
+// zh-TW, ja-JP, ko-KR, es-ES, pt-BR. reloadTargetId optionally reloads that tab.
+// Keys: Enter, Tab, Backspace, Escape, ArrowLeft/Up/Right/Down.
+// <id> comes from /tabs or /new-tab; brackets mean an optional path segment.
+// Errors: HTTP 500 {error}; unsupported key: HTTP 400 {error}.
+// https://www.google.com is an example destination; replace it as needed.
+$('open-tab').onclick = async () => {
+  try {
+    const { id } = await getJson('/web-browser/api/new-tab', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: 'https://www.google.com', colorScheme: 'light' })
+    });
+    await getJson(`/web-browser/api/switch-tab/${id}`, { method: 'POST' });
+  } catch (err) {
+    show('error', err.message);
+  }
+};
+
+// File content endpoint: /file-api/api/file/content; keep it unchanged.
+// File paths omit the /worktrees prefix.
+// /folder-1/picture.png is a mock path: use one that exists.
+$('fetch-file').onclick = async () => {
+  try {
+    const path = encodeURIComponent('/folder-1/picture.png');
+    const response = await fetch(`/file-api/api/file/content?path=${path}`);
+    if (!response.ok) throw new Error(await response.text());
+    const image = $('fetched-image');
+    if (!image.hidden) URL.revokeObjectURL(image.src);
+    image.src = URL.createObjectURL(await response.blob());
+    image.hidden = false;
+  } catch (err) {
+    show('error', err.message);
+  }
+};
+
+// Hermes API gateway prefix: /openai-endpoint; keep it unchanged.
+// Add /p/<id> for non-default profiles.
+function hermes(path) {
+  const profile = $('profile').value;
+  if (profile === 'default') {
+    return '/openai-endpoint' + path;
+  } else {
+    return `/openai-endpoint/p/${profile}` + path;
+  }
+}
+
+async function getJson(url, options = {}) {
+  options.headers = { Authorization: `Bearer ${KEY}`, ...options.headers };
+  const res = await fetch(url, options);
+  if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
+  return res.json();
+}
+
+function show(who, text) {
+  const div = document.createElement('li');
+  const role = document.createElement('b');
+  role.textContent = `${who}: `;
+  div.append(role, document.createTextNode(text));
+  $('log').appendChild(div);
+  return div;
+}
+
+// /mgr/api/v1/agents -> {agents: [{id, display_name}]}; keep endpoint unchanged.
+async function loadProfiles() {
+  const { agents } = await getJson('/mgr/api/v1/agents');
+  for (const a of agents) $('profile').add(new Option(a.display_name || a.id, a.id));
+}
+
+// Hermes session list endpoint; keep /api/sessions?source=api_server unchanged.
+// source=api_server excludes IM platform sessions.
+async function loadSessions() {
+  const { data } = await getJson(hermes('/api/sessions?source=api_server'));
+  $('session').innerHTML = '<option value="">(new chat)</option>';
+  for (const s of data) $('session').add(new Option(s.title || s.preview || s.id, s.id));
+  $('session').value = sessionId || '';
+}
+
+// /api/sessions/<id>/messages -> {data: [{role, content, tool_calls}]}.
+// Keep endpoint unchanged; use the selected profile's session ID.
+async function openSession(id) {
+  sessionId = id || null;
+  $('log').innerHTML = '';
+  if (!sessionId) return;
+  const { data } = await getJson(hermes(`/api/sessions/${sessionId}/messages`));
+  for (const m of data) {
+    if (m.role === 'user' || m.role === 'assistant') {
+      if (typeof m.content === 'string' && m.content) show(m.role, m.content);
+      for (const call of m.tool_calls || []) show('tool', call.function.name);
+    }
+  }
+}
+
+// Keep /file-api/api/folders and /file-api/api/upload unchanged.
+// /uploads is this demo's upload destination; change it if needed.
+// Multipart field name is file. Uploads keep the filename and overwrite matches.
+async function upload(file) {
+  // mkdir -p; failure is ignored when /uploads exists.
+  await fetch('/file-api/api/folders', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ dir: '/', name: 'uploads' })
+  });
+  const body = new FormData();
+  body.append('file', file);
+  const { file: saved } = await getJson('/file-api/api/upload?dir=/uploads/', { method: 'POST', body });
+  // /worktrees is where the agent sees File API paths.
+  return `/worktrees${saved.path}`;
+}
+
+// /api/sessions/<id>/chat/stream, body {message} -> SSE events:
+//   assistant.delta {delta}, tool.started {tool_name}, assistant.completed {content}, error {message}
+// Keep these server event names unchanged.
+async function send(text) {
+  if (!sessionId) {
+    // /api/sessions creates a session with {}; keep endpoint unchanged.
+    const { session } = await getJson(hermes('/api/sessions'), { method: 'POST', body: '{}' });
+    sessionId = session.id;
+  }
+  show('user', text);
+  const res = await fetch(hermes(`/api/sessions/${sessionId}/chat/stream`), {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${KEY}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message: text })
+  });
+  if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
+
+  const reader = res.body.pipeThrough(new TextDecoderStream()).getReader();
+  let buffer = '';
+  let answer = '';
+  let reply = null;
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += value;
+    const frames = buffer.split('\n\n');
+    buffer = frames.pop();
+    for (const frame of frames) {
+      const event = frame.match(/^event: (.*)$/m)?.[1];
+      const data = frame.match(/^data: (.*)$/m)?.[1];
+      if (!data) continue;
+      const payload = JSON.parse(data);
+      if (event === 'assistant.delta') answer += payload.delta;
+      if (event === 'tool.started') {
+        show('tool', payload.tool_name);
+        answer = '';
+        reply = null;
+      }
+      if (event === 'assistant.completed') answer = payload.content || answer;
+      if (event === 'error') show('error', payload.message);
+      if (answer) {
+        reply ??= show('assistant', '');
+        reply.lastChild.textContent = answer;
+      }
+    }
+  }
+  await loadSessions();
+}
+
+$('form').onsubmit = async (event) => {
+  event.preventDefault();
+  let text = $('text').value.trim();
+  const file = $('file').files[0];
+  $('text').value = '';
+  $('file').value = '';
+  $('loading').hidden = false;
+  const button = $('form').querySelector('button');
+  button.disabled = true;
+  try {
+    if (file) text += `\nAttached file: ${await upload(file)}`;
+    if (text.trim()) await send(text.trim());
+  } catch (err) {
+    show('error', err.message);
+  } finally {
+    $('loading').hidden = true;
+    button.disabled = false;
+  }
+};
+$('profile').onchange = () => openSession(null).then(loadSessions);
+$('session').onchange = () => openSession($('session').value);
+$('new').onclick = () => openSession(null).then(loadSessions);
+
+loadProfiles().then(loadSessions).catch((err) => show('error', err.message));
+</script>
