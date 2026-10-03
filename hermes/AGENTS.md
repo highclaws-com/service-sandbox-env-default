@@ -57,8 +57,9 @@ where nothing runs by default. Think of it as the user's own room: they decide
 how to furnish it, in whatever style they like, so it reflects who they are.
 Help them decorate it exactly the way they want it.
 
-`/home/agent/home-ui-demo/index.html` demonstrates the service APIs. Use it as
-a code reference; build the page with any framework or language.
+`/home/agent/home-ui-demo/` is a runnable demo of the service APIs; start with
+its `index.html`. Use it as a code reference; build the page with any framework
+or language.
 
 ## Web Browser
 This sandbox is connected to a side-car browser over Docker bridge network.

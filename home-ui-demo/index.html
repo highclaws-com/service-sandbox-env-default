@@ -1,4 +1,5 @@
 <!doctype html>
+<!-- Serve this folder on the home page port: python3 server.py -->
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width">
@@ -29,6 +30,10 @@
   target="_blank">Open file preview</a>
 <button type="button" id="fetch-file">Fetch image content</button>
 <div><img id="fetched-image" width="320" hidden></div>
+<hr>
+
+<h2>Agent avatars</h2>
+<div id="avatars"></div>
 <hr>
 
 <h2>Agent chat</h2>
@@ -173,7 +178,24 @@ function show(who, text) {
 // Keep the endpoint unchanged; use id in URLs and display_name as the label.
 async function loadProfiles() {
   const { agents } = await getJson('/mgr/api/v1/agents');
-  for (const a of agents) $('profile').add(new Option(a.display_name || a.id, a.id));
+  for (const a of agents) {
+    $('profile').add(new Option(a.display_name || a.id, a.id));
+    if (a.display_name?.trim()) {
+      const img = new Image();
+      img.src = await agentAvatar(a.display_name);
+      $('avatars').append(img);
+    }
+  }
+}
+
+// Users recognize agents by the console's avatar: DiceBear pixel-art seeded
+// by the SHA-256 hex of the trimmed, lowercased display_name; no name, none.
+// Reuse ./dicebear.js; other DiceBear versions draw other characters.
+// Other languages: same seed, https://api.dicebear.com/9.x/pixel-art/svg?seed=<seed>
+async function agentAvatar(name) {
+  const { createAvatar, pixelArt, sha256 } = await import('./dicebear.js');
+  const seed = sha256(name.trim().toLowerCase()).toString();
+  return createAvatar(pixelArt, { seed }).toDataUri();
 }
 
 // Hermes session list endpoint; keep /api/sessions?source=api_server unchanged.
