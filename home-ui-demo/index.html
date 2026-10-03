@@ -53,25 +53,41 @@ let sessionId = null;
 
 // Shared browser API (uses Chrome DevTools Protocol underneath).
 // Base URI: /web-browser/api; keep it unchanged. POST bodies are JSON.
+
 // GET  /config                -> {streamUrl}
+// Returns the video player's URL; resolve relative URLs against /web-browser/.
+
 // GET  /stream-status         -> {streaming, error?}
+// Checks whether the video service responds; it does not test playback.
+
 // GET  /tabs                  -> [{id, title, url, faviconUrl, type, visible}]
+// Lists browser tabs; visible identifies the tab currently shown.
+
 // POST /new-tab               {url, colorScheme, language} -> {status, id}
+// Opens a URL in a new tab; switch-tab brings it into view.
+
 // POST /switch-tab/<id>       -> {status}; activates the tab shown in the stream
+
 // POST /close-tab/<id>        -> {status}
+// Closes the selected tab.
+
 // POST /back[/<id>]           -> {status}
 // POST /forward[/<id>]        -> {status}
 // POST /reload[/<id>]         -> {status}
+// back/forward navigate the tab's history; reload refreshes its current page.
+
 // POST /type[/<id>]           {text} -> {status}
+// Inserts text into the tab's focused input; without <id>, uses the visible tab.
+
 // POST /key[/<id>]            {key} -> {status}
-// POST /color-scheme          {scheme, reloadTargetId?} -> {status, scheme, results}
-// POST /language              {language, reloadTargetId?} -> {status, language,
-//                             locale, acceptLanguage, results}
-// colorScheme/scheme: light or dark. language: en-US, de-DE, fr-FR, zh-CN,
-// zh-TW, ja-JP, ko-KR, es-ES, pt-BR. reloadTargetId optionally reloads that tab.
+// Sends a key press and release, e.g. {key: 'Enter'} to submit a focused form.
+
+// Omitted IDs use CDP's default page target, except /type uses the visible tab.
+// /new-tab colorScheme: light or dark; language is optional (defaults to en-US).
 // Keys: Enter, Tab, Backspace, Escape, ArrowLeft/Up/Right/Down.
 // <id> comes from /tabs or /new-tab; brackets mean an optional path segment.
 // Errors: HTTP 500 {error}; unsupported key: HTTP 400 {error}.
+
 // https://www.google.com is an example destination; replace it as needed.
 $('open-tab').onclick = async () => {
   try {
@@ -86,8 +102,30 @@ $('open-tab').onclick = async () => {
   }
 };
 
-// File content endpoint: /file-api/api/file/content; keep it unchanged.
-// File paths omit the /worktrees prefix.
+// File API base URI: /file-api/api; keep it unchanged. POST bodies are JSON,
+// except /upload (multipart). Paths omit /worktrees; encode query values.
+
+// GET    /files?dir=...&page=1&sortBy=name&sortOrder=asc
+// Lists a directory. dir=/ lists /worktrees; page numbers start at 1.
+//        -> {items: [{name, path, isDir, size, mtime, ext}], pagination:
+//            {page, limit, totalItems, totalPages}}
+//        sortBy: name/size/ext/mtime; sortOrder: asc/desc.
+
+// GET    /file/content?path=... -> file bytes; use for text, images or media.
+// Supports Range headers for partial downloads and media seeking.
+
+// PUT    /file/content?path=... -> {message}; creates or replaces file content.
+// Send raw text/bytes with the file's Content-Type, not a JSON wrapper.
+
+// POST   /folders       {dir, name} -> {message}
+// Creates a folder: {dir: '/', name: 'uploads'} creates /worktrees/uploads.
+
+// POST   /upload?dir=... multipart field "file" -> {message, file: {filename, path, size}}
+// Uploads into an existing directory, keeping the filename and replacing matches.
+// Use FormData; the browser sets its multipart Content-Type and boundary.
+
+// Failures use non-2xx HTTP status codes with {error}.
+
 // /folder-1/picture.png is a mock path: use one that exists.
 $('fetch-file').onclick = async () => {
   try {
@@ -104,6 +142,7 @@ $('fetch-file').onclick = async () => {
 };
 
 // Hermes API gateway prefix: /openai-endpoint; keep it unchanged.
+// 'default' is the default profile ID; other IDs come from /mgr/api/v1/agents.
 // Add /p/<id> for non-default profiles.
 function hermes(path) {
   const profile = $('profile').value;
@@ -130,14 +169,15 @@ function show(who, text) {
   return div;
 }
 
-// /mgr/api/v1/agents -> {agents: [{id, display_name}]}; keep endpoint unchanged.
+// GET /mgr/api/v1/agents lists agent profiles -> {agents: [{id, display_name}]}.
+// Keep the endpoint unchanged; use id in URLs and display_name as the label.
 async function loadProfiles() {
   const { agents } = await getJson('/mgr/api/v1/agents');
   for (const a of agents) $('profile').add(new Option(a.display_name || a.id, a.id));
 }
 
 // Hermes session list endpoint; keep /api/sessions?source=api_server unchanged.
-// source=api_server excludes IM platform sessions.
+// Lists API chats -> {data: [{id, title, preview}]}; excludes IM platform sessions.
 async function loadSessions() {
   const { data } = await getJson(hermes('/api/sessions?source=api_server'));
   $('session').innerHTML = '<option value="">(new chat)</option>';
@@ -146,7 +186,7 @@ async function loadSessions() {
 }
 
 // /api/sessions/<id>/messages -> {data: [{role, content, tool_calls}]}.
-// Keep endpoint unchanged; use the selected profile's session ID.
+// Reads saved chat history. Keep endpoint unchanged; use that profile's session ID.
 async function openSession(id) {
   sessionId = id || null;
   $('log').innerHTML = '';
@@ -162,9 +202,8 @@ async function openSession(id) {
 
 // Keep /file-api/api/folders and /file-api/api/upload unchanged.
 // /uploads is this demo's upload destination; change it if needed.
-// Multipart field name is file. Uploads keep the filename and overwrite matches.
 async function upload(file) {
-  // mkdir -p; failure is ignored when /uploads exists.
+  // The folder API reports an error if it already exists; this demo ignores it.
   await fetch('/file-api/api/folders', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -177,12 +216,13 @@ async function upload(file) {
   return `/worktrees${saved.path}`;
 }
 
-// /api/sessions/<id>/chat/stream, body {message} -> SSE events:
-//   assistant.delta {delta}, tool.started {tool_name}, assistant.completed {content}, error {message}
-// Keep these server event names unchanged.
+// POST /api/sessions/<id>/chat/stream sends {message} and streams the reply.
+// Keep the endpoint and these SSE event names unchanged:
+// assistant.delta {delta}: append reply text; tool.started {tool_name}: tool call.
+// assistant.completed {content}: final reply text; error {message}: turn failure.
 async function send(text) {
   if (!sessionId) {
-    // /api/sessions creates a session with {}; keep endpoint unchanged.
+    // POST /api/sessions with {} creates a chat -> {session: {id}}; keep URI unchanged.
     const { session } = await getJson(hermes('/api/sessions'), { method: 'POST', body: '{}' });
     sessionId = session.id;
   }
