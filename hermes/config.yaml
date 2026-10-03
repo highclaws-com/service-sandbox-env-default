@@ -36,6 +36,9 @@ agent:
   - kanban
 goals:
   max_turns: 5000
+memory:
+  memory_char_limit: 8000   # MEMORY.md cap, ~2.9k tokens
+  user_char_limit: 4000     # USER.md cap, ~1.5k tokens
 model:
   #default: minimax/minimax-m2.5:free
   #api_key: vk-openrouter
