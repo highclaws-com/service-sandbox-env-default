@@ -4,8 +4,19 @@ platforms:
   api_server:
     extra:
       host: 0.0.0.0
+  telegram:
+    unauthorized_dm_behavior: ignore
+  slack:
+    unauthorized_dm_behavior: ignore
+  feishu:
+    unauthorized_dm_behavior: ignore
   line:
     enabled: true
+    unauthorized_dm_behavior: ignore
+  weixin:
+    unauthorized_dm_behavior: ignore
+  photon:
+    unauthorized_dm_behavior: ignore
 terminal:
   backend: local
   cwd: /home/agent
