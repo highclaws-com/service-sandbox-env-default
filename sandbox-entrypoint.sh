@@ -21,6 +21,7 @@ fi
 chown agent:agent \
     /home/agent/.hermes/.env \
     /home/agent/.hermes/config.yaml \
+    /home/agent/.hermes/SOUL.md \
     /home/agent/.hermes/memories \
     /home/agent/.hermes/cron \
     /home/agent/.hermes/skills \
