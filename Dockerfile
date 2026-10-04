@@ -85,13 +85,12 @@ ENV PATH="/home/agent/.local/bin:${PATH}"
 COPY --chown=agent:agent ./hermes/fork /home/agent/hermes
 COPY --chown=agent:agent ./hermes/install-stamp.json /home/agent/hermes/install-stamp.json
 RUN cd hermes && \
-    pip install --no-cache-dir -e ".[cli,messaging,cron,pty,feishu]" "websockets==15.0.1" --break-system-packages && \
-    bash -c "mkdir -p ~/.hermes/{cron,sessions,logs,memories,skills}" && \
-    bash -c "cp cli-config.yaml.example ~/.hermes/config.yaml.example" && \
-    bash -c "cp .env.example ~/.hermes/.env.example"
+    pip install --no-cache-dir -e ".[cli,messaging,cron,pty,feishu]" "websockets==15.0.1" --break-system-packages
 
-COPY --chown=agent:agent ./hermes/hooks /home/agent/.hermes/hooks
-COPY --chown=agent:agent ./hermes/plugins /home/agent/.hermes/plugins
+# /home/agent/.hermes is a host mount, so the entrypoint copies these into it
+# on every start: /home/agent/hermes-init/{hooks,plugins} -> /home/agent/.hermes/
+COPY --chown=agent:agent ./hermes/hooks /home/agent/hermes-init/hooks
+COPY --chown=agent:agent ./hermes/plugins /home/agent/hermes-init/plugins
 COPY --chown=agent:agent ./hermes/SOUL.md /home/agent/SOUL.init.md
 
 # set up Supervisor

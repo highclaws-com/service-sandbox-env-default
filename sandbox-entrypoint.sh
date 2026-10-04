@@ -15,20 +15,21 @@ if [ ! -f /home/agent/.supervisor/provision_callback_completed ]; then
     : > /home/agent/.hermes/profile.yaml
 fi
 
+# Hooks and plugins are sandbox infrastructure, not agent data: replace them
+# with the image's copies on every start, e.g. after a restore or image update.
+rm -rf /home/agent/.hermes/hooks /home/agent/.hermes/plugins
+cp -a /home/agent/hermes-init/hooks /home/agent/hermes-init/plugins /home/agent/.hermes/
+
 # Do not use chown -R on /home/agent/.hermes. Persisted Hermes dirs can grow
 # large. Also, Docker creates missing bind-mount source dirs as root:root, so
 # fix the mountpoint directories Hermes need write to.
 chown agent:agent \
+    /home/agent/.hermes \
     /home/agent/.hermes/.env \
     /home/agent/.hermes/config.yaml \
     /home/agent/.hermes/SOUL.md \
-    /home/agent/.hermes/memories \
-    /home/agent/.hermes/cron \
-    /home/agent/.hermes/skills \
     /home/agent/.hermes/profiles \
-    /home/agent/profile-staging \
-    /home/agent/.hermes/sessions \
-    /home/agent/.hermes/state.* || true
+    /home/agent/profile-staging || true
 
 if [ ! -f /home/agent/AGENTS.md ]; then
     echo "Missing required file: /home/agent/AGENTS.md" >&2
