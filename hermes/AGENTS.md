@@ -443,10 +443,15 @@ in the file browser (`folder-1` is an example):
 hermes backup -o /worktrees/folder-1/hermes-backups/
 ```
 
-On a **new sandbox**, use `hermes import`, not `hermes profile import`, to restore:
+To restore on a **new sandbox**, call the management API. The restore removes
+every agent's model, so you cannot reply afterwards: first tell the user to set
+the models and messaging apps again in the Sandbox Management Console.
 ```sh
-hermes import --force /worktrees/folder-1/hermes-backups/ACTUAL-BACKUP-FILENAME.zip
+curl -X PUT http://sandbox_mgr:8000/api/v1/agents/restore \
+  -H 'Content-Type: application/json' \
+  -d '{"path": "/worktrees/folder-1/hermes-backups/ACTUAL-BACKUP-FILENAME.zip"}'
 ```
+Fall back to `hermes import --force <backup.zip>` only if the API fails.
 
 ## Note on Scheduled Task Timezones
 The `cronjob` tool accepts several schedule forms. Treat them differently:
