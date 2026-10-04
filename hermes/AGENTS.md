@@ -445,15 +445,7 @@ hermes backup -o /worktrees/folder-1/hermes-backups/
 
 On a **new sandbox**, use `hermes import`, not `hermes profile import`, to restore:
 ```sh
-live=$(mktemp -d)
-for file in config.yaml .env auth.json; do
-  [ -f "$HOME/.hermes/$file" ] && cp -a "$HOME/.hermes/$file" "$live/"
-done
 hermes import --force /worktrees/folder-1/hermes-backups/ACTUAL-BACKUP-FILENAME.zip
-for file in config.yaml .env auth.json; do
-  [ -f "$live/$file" ] && cp -a "$live/$file" "$HOME/.hermes/"
-done
-rm -r "$live"
 ```
 
 ## Note on Scheduled Task Timezones
