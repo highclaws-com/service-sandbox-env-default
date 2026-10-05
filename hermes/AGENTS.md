@@ -411,7 +411,7 @@ connect it to their desktop through a KVM (keyboard, video, mouse) device. The
 agent can then use CUA to operate the KVM streaming window on the desktop and
 control the device indirectly.
 
-## Hermes, Agent Profiles, and Backup-Restore
+## Hermes and Agent Profiles
 The `/home/agent/hermes` has the exact Hermes source code serving this sandbox.
 Whenever you need to understand how your agentic framework works, refer to the
 source code.
@@ -435,23 +435,46 @@ with that profile's own tools:
 hermes -p <profile-id> chat -q "Set a reminder for one minute from now: buy groceries"
 ```
 
-To backup, use `hermes backup`, not `hermes profile export` — profile exports
-cannot fully restore the default agent. Save into an existing user-visible
-worktree so the sandbox backup system includes it and the user can confirm it
-in the file browser (`folder-1` is an example):
+## Profile Backup and Restore
+Agent profiles hold personas, memories, sessions, skills, etc. The browser
+profile holds website logins, etc. When the user asks to back up or restore
+"your memory", "your chats", "the agents", or similar, they mean the agent
+profiles; "my logins" or "the browser" mean the browser profile. Backup files
+sit at the top level of the user's file browser.
+
+To back up the browser profile:
 ```sh
-hermes backup -o /worktrees/folder-1/hermes-backups/
+curl -X PUT http://sandbox_mgr:8000/api/v1/browser/backup
+```
+The backup is named `browser-profile.bkup.<YYYYMMDD-HHMMSS>.zip` (UTC).
+
+To back up the agent profiles:
+```sh
+curl -X PUT http://sandbox_mgr:8000/api/v1/agents/backup
+```
+The backup is named `agents-profile.bkup.<YYYYMMDD-HHMMSS>.zip` (UTC).
+
+To restore the browser profile:
+```sh
+curl -X PUT http://sandbox_mgr:8000/api/v1/browser/restore \
+  -H 'Content-Type: application/json' \
+  -d '{"name": "<backup-zip-name>"}'
 ```
 
-To restore on a **new sandbox**, call the management API. The restore removes
-every agent's model, so you cannot reply afterwards: first tell the user to set
-the models and messaging apps again in the Sandbox Management Console.
+To restore the agent profiles, first remind the user that the backup replaces
+the current agents, and that they need to set the models and messaging apps
+again afterwards. The restore stops every agent, including you, so when
+restoring both profiles, restore the browser first:
 ```sh
 curl -X PUT http://sandbox_mgr:8000/api/v1/agents/restore \
   -H 'Content-Type: application/json' \
-  -d '{"path": "/worktrees/folder-1/hermes-backups/ACTUAL-BACKUP-FILENAME.zip"}'
+  -d '{"name": "<backup-zip-name>"}'
 ```
-Fall back to `hermes import --force <backup.zip>` only if the API fails.
+
+Use these sandbox management API calls, not `hermes backup`, `hermes import`
+or `hermes profile export|import`. A restore through the sandbox management
+API stops the agents first and updates the sandbox settings afterwards. The
+`hermes` commands do neither, so the data can become inconsistent.
 
 ## Note on Scheduled Task Timezones
 The `cronjob` tool accepts several schedule forms. Treat them differently:
