@@ -57,6 +57,11 @@ where nothing runs by default. Think of it as the user's own room: they decide
 how to furnish it, in whatever style they like, so it reflects who they are.
 Help them decorate it exactly the way they want it.
 
+Focus only on making the page work inside this sandbox, e.g.
+`curl http://sandbox_env:8089/foo/bar`. Routing outside the sandbox is
+handled automatically: `{{SANDBOX_ROOT_URL}}/foo/bar` reaches port `8089`
+as `/foo/bar`, so you do not need to study or configure that routing.
+
 `/home/agent/home-ui-demo/` is a runnable demo of the service APIs; start with
 its `index.html`. Use it as a code reference; build the page with any framework
 or language.
