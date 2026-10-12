@@ -163,11 +163,20 @@ sandbox path such as `/worktrees/X/Y` should be converted to the browser path
 agent-browser upload 'input[type="file"]' '/home/neko/Downloads/X/Y'
 ```
 
+## Sandbox Management API
+The sandbox management API at `http://sandbox_mgr:8000` runs the same
+operations as the user's Sandbox Management Console: worktrees, databases,
+browser, etc. It is a FastAPI service; read its spec at
+`http://sandbox_mgr:8000/openapi.json`.
+
 ## Database
-When you are working on any task and using a database would be helpful, you can
-message the user to add a database from the "Sandbox Management Console", and
-then they can create and are able to send you a PostgreSQL connection link,
-including a dedicated database, username, and password for your task.
+When a database would be helpful for your task, you can create one yourself
+through the Sandbox Management API described above. Read its OpenAPI spec for
+the database endpoints and request fields.
+
+Alternatively, ask the user to create a database in the Sandbox Management
+Console and send you a PostgreSQL connection link, including a dedicated
+database, username, and password for your task.
 
 ## Worktrees
 For the local file system, the user can view a web-based file browser which is
@@ -204,12 +213,6 @@ the following (encode the path fields if they contain special characters):
 ```
 (the prefix `/worktrees` is omitted because it is a fixed prefix)
 
-## Sandbox Management API
-The sandbox management API at `http://sandbox_mgr:8000` runs the same
-operations as the user's Sandbox Management Console: worktrees, databases,
-browser, etc. It is a FastAPI service; read its spec at
-`http://sandbox_mgr:8000/openapi.json`.
-
 ## Local File Search
 To make it easier for you and the user to search against existing local files,
 there is a fully fledged hybrid search engine that both of you can use:
@@ -222,6 +225,11 @@ to use it.
 This local search targets common text-based files, such as PDFs, TXT files,
 Markdown files, and file names across all worktrees. It is especially useful
 when a worktree contains many files or when the files are large.
+
+Indexing can be slow, so newly added or changed files may not be searchable
+immediately. Run `search-cli status` to check whether indexing has completed
+(`is_indexing`) and, while it is running, which files are currently being
+processed and indexed (`indexer_progress`).
 
 ## Persistent Services
 The Core Supervisor runs Hermes; do not modify `/etc/supervisor/conf.d`. Put
@@ -277,10 +285,16 @@ supervisorctl -c /etc/supervisor/user-supervisord.conf tail -30 <service-name> s
 If the user reports that a service is no longer running, first check whether it
 was added as a persistent Supervisor service.
 
-If the service was only started from a shell, explain that it would not survive
-sandbox restarts. Also remind the user that sandbox configuration changes may
-restart or recreate the agent container, including model changes, connecting a
-new IM platform, or changing the persona/instructions.
+If the service was only started from your shell, explain that it is tied to
+the agent gateway, so it usually stops when the gateway or the sandbox restarts.
+Remind the user that these actions restart the agent gateway:
+- connecting or changing a messaging app (IM platform);
+- changing the timezone;
+- restoring an agent backup.
+
+Restarting the sandbox from the Sandbox Management Console or API restarts the
+whole agent container. Supervisor services survive gateway restarts and start again
+after a sandbox restart when `autostart=true`.
 
 ## Cloudflare Tunnel and LINE IM
 If user needs a public HTTPS domain to a local service, utilize the `cloudflared`
@@ -317,7 +331,7 @@ After the tunnel is established, let the user know he/she should visit
 with Message API. Assuming the cloudflared output above, user should set the
 URL to `https://sells-cited-constitutes-execute.trycloudflare.com/line/webhook`
 
-## Extra Tools
+## Official External GUIs
 If the user needs a Kanban board, do not set up the default Hermes Kanban UI.
 Instead, clone and use https://github.com/highclaws-com/hermes-kanban-ui.git.
 
@@ -487,6 +501,13 @@ Use these sandbox management API calls, not `hermes backup`, `hermes import`
 or `hermes profile export|import`. A restore through the sandbox management
 API stops the agents first and updates the sandbox settings afterwards. The
 `hermes` commands do neither, so the data can become inconsistent.
+
+Before any restore, always warn the user that it overwrites the current
+profile files, and restore only after they confirm. A browser restore replaces
+the current logins; an agent restore replaces the current agents, including
+their memories and chats. For this reason, the Sandbox Management Console has
+no restore button, except in the dialog that creates a new sandbox, where there
+is nothing to overwrite yet.
 
 ## Note on Scheduled Task Timezones
 The `cronjob` tool accepts several schedule forms. Treat them differently:
