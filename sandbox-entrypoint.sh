@@ -2,6 +2,7 @@
 set -eu
 
 mkdir -p \
+    /run/sshd \
     /home/agent/.hermes/profiles \
     /home/agent/profile-staging \
     /home/agent/.supervisor/conf.d \

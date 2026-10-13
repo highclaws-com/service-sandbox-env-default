@@ -1,0 +1,18 @@
+# sshd for the user's `ssh -R`: a login can only open 127.0.0.1:2222 here.
+# Keys come from sandbox_mgr via the /etc/ssh/reverse_ssh mount.
+Port 2022
+HostKey /etc/ssh/reverse_ssh/host_key
+AuthorizedKeysFile /etc/ssh/reverse_ssh/authorized_keys
+
+AllowUsers tunnel
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+
+AllowTcpForwarding remote
+AllowStreamLocalForwarding no
+PermitListen 127.0.0.1:2222
+ForceCommand /bin/false
+
+# Drop dead clients so a reconnect can claim 127.0.0.1:2222 again.
+ClientAliveInterval 30
+ClientAliveCountMax 3

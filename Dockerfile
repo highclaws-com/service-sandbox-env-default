@@ -43,8 +43,13 @@ RUN apt-get update && apt-get install -y \
     procps \
     supervisor \
     openssh-client \
+    openssh-server \
     sshpass \
     && rm -rf /var/lib/apt/lists/*
+
+# The user's `ssh -R` logs in as `tunnel`; "*" = no password, keys still work.
+RUN useradd --system --no-create-home --shell /usr/sbin/nologin \
+    --password '*' tunnel
 
 # Install cloudflared from Cloudflare's apt repository.
 RUN mkdir -p --mode=0755 /usr/share/keyrings && \
@@ -95,10 +100,7 @@ COPY --chown=agent:agent ./hermes/SOUL.md /home/agent/SOUL.init.md
 
 # set up Supervisor
 USER root
-COPY supervisor/core-supervisord.conf /etc/supervisor/core-supervisord.conf
-COPY supervisor/user-supervisord.conf /etc/supervisor/user-supervisord.conf
-COPY supervisor/conf.d/hermes.conf /etc/supervisor/conf.d/hermes.conf
-COPY supervisor/conf.d/start-user-supervisor.conf /etc/supervisor/conf.d/start-user-supervisor.conf
+COPY supervisor/ /etc/supervisor/
 COPY --chown=agent:agent home-ui-demo /home/agent/home-ui-demo
 COPY sandbox-entrypoint.sh /usr/local/bin/sandbox-entrypoint.sh
 RUN chmod 0755 /usr/local/bin/sandbox-entrypoint.sh && \

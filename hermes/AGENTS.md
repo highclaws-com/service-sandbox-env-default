@@ -360,9 +360,9 @@ capabilities.
   prompt for that agent, including `https://github.com/highclaws-com/cli`.
   Tell it to read the repository's README.md and AGENTS.md, download and install
   `hc`, and complete the local setup. For SSH-based access, tell it to enable
-  and test SSH, run `hc expose tcp:22`, and return the tunnel address. Do not
-  ask the user to perform those steps themselves. You then bridge the tunnel
-  with `cloudflared access tcp` and connect to the target computer.
+  and test SSH, then open the reverse tunnel from the README. Do not ask the
+  user to perform those steps themselves. You then connect to the target
+  computer with `ssh -p 2222 <user>@localhost`.
 - Only if they have no local AI agent, read the CLI repository's README.md and
   AGENTS.md yourself and ask which OS they use if it is not already known;
   release binaries and prerequisites are platform-specific. Guide them through
@@ -370,8 +370,11 @@ capabilities.
   how to use a terminal.
 - `hc` must be installed on the target computer for every use case in this
   section. For SSH-based access, including CUA and Guacamole, do not proceed
-  with the cloud-side bridge until `hc expose tcp:22` is running and you have
-  its tunnel address.
+  until the reverse tunnel is running. If another computer is already using
+  that tunnel, use `hc expose tcp:22` and bridge its hostname with
+  `cloudflared access tcp` on a different local port. Remind the user that
+  `hc expose tcp:22` must only be temporary and is unsafe because it exposes
+  their SSH port publicly.
 
 If you receive a Cloudflare tunnel address, such as a `*.trycloudflare.com`
 hostname, it may be a tunnel the user exposed with `hc expose` on their own.
