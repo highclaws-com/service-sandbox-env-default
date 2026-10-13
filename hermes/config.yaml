@@ -71,6 +71,7 @@ plugins:
   enabled:
     - cron_capture
     - discord_dm_pairing_only
+    - naonao
 discord:
   auto_thread: false
   require_mention: true

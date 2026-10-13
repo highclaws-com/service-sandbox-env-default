@@ -90,7 +90,8 @@ ENV PATH="/home/agent/.local/bin:${PATH}"
 COPY --chown=agent:agent ./hermes/fork /home/agent/hermes
 COPY --chown=agent:agent ./hermes/install-stamp.json /home/agent/hermes/install-stamp.json
 RUN cd hermes && \
-    pip install --no-cache-dir -e ".[cli,messaging,cron,pty,feishu]" "websockets==15.0.1" --break-system-packages
+    pip install --no-cache-dir -e ".[cli,messaging,cron,pty,feishu]" \
+    "websockets==15.0.1" "python-socks==3.1.1" --break-system-packages
 
 # /home/agent/.hermes is a host mount, so the entrypoint copies these into it
 # on every start: /home/agent/hermes-init/{hooks,plugins} -> /home/agent/.hermes/
