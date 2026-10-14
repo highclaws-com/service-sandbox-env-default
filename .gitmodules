@@ -11,3 +11,4 @@
 [submodule "hermes/plugins/naonao"]
 	path = hermes/plugins/naonao
 	url = https://github.com/0xzeshawn/hermes-naonao-plugin.git
+	ignore = untracked
