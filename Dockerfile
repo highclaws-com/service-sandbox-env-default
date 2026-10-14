@@ -24,6 +24,14 @@ WORKDIR /agent-browser
 COPY browser-cli .
 RUN pnpm install && pnpm build:native
 
+# Build the default sandbox home page
+FROM node:22-trixie-slim AS home-ui-builder
+WORKDIR /home-ui-default
+COPY home-ui-default/package.json home-ui-default/package-lock.json ./
+RUN npm ci --no-audit --no-fund
+COPY home-ui-default .
+RUN npm run build
+
 FROM node:22-trixie-slim AS node-runtime
 
 FROM python:3.14.7-slim-trixie
@@ -103,6 +111,9 @@ COPY --chown=agent:agent ./hermes/SOUL.md /home/agent/SOUL.init.md
 USER root
 COPY supervisor/ /etc/supervisor/
 COPY --chown=agent:agent home-ui-demo /home/agent/home-ui-demo
+# Copy the whole project, not only the build, so the agent can easily
+# customize it with the source code.
+COPY --chown=agent:agent --from=home-ui-builder /home-ui-default /home/agent/home-ui-default
 COPY sandbox-entrypoint.sh /usr/local/bin/sandbox-entrypoint.sh
 RUN chmod 0755 /usr/local/bin/sandbox-entrypoint.sh && \
     ln -sf /home/agent/.local/bin/hermes /usr/local/bin/hermes && \

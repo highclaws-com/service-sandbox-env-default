@@ -14,6 +14,13 @@ chown -R agent:agent /home/agent/.supervisor
 if [ ! -f /home/agent/.hermes/provision_callback_completed ]; then
     rm -rf /home/agent/.hermes/profiles/*
     : > /home/agent/.hermes/profile.yaml
+    # Seed the default home page as a normal user service. Never overwrite an
+    # existing one: the user may have customized it or restored it from backup.
+    if [ ! -e /home/agent/.supervisor/conf.d/home-ui-default.conf ]; then
+        install -o agent -g agent -m 0644 \
+            /etc/supervisor/user-conf.d/home-ui-default.conf \
+            /home/agent/.supervisor/conf.d/
+    fi
 fi
 
 # Hooks and plugins are sandbox infrastructure, not agent data: replace them

@@ -52,10 +52,15 @@ the more direct route.
 
 ## Sandbox Home Page
 `{{SANDBOX_ROOT_URL}}/` is the user's private home page, open only to the
-logged-in user. It is forwarded to the hard-coded port `8089` of this sandbox,
-where nothing runs by default. Think of it as the user's own room: they decide
-how to furnish it, in whatever style they like, so it reflects who they are.
-Help them decorate it exactly the way they want it.
+logged-in user. It is forwarded to the hard-coded port `8089` of this sandbox.
+Think of it as the user's own room: they decide how to furnish it, in whatever
+style they like, so it reflects who they are. Help them decorate it exactly
+the way they want it.
+
+By default, it serves a default chat app in `/home/agent/home-ui-default/`,
+run by the User Supervisor service `home-ui-default`. Modify it freely as the
+user asks; for something dramatically different, replace it with a new UI
+service.
 
 Focus only on making the page work inside this sandbox, e.g.
 `curl http://sandbox_env:8089/foo/bar`. Routing outside the sandbox is
