@@ -14,6 +14,7 @@ chown -R agent:agent /home/agent/.supervisor
 if [ ! -f /home/agent/.hermes/provision_callback_completed ]; then
     rm -rf /home/agent/.hermes/profiles/*
     : > /home/agent/.hermes/profile.yaml
+    copy-hermes-init.sh --seed /home/agent/.hermes
     # Seed the default home page as a normal user service. Never overwrite an
     # existing one: the user may have customized it or restored it from backup.
     if [ ! -e /home/agent/.supervisor/conf.d/home-ui-default.conf ]; then
@@ -23,10 +24,15 @@ if [ ! -f /home/agent/.hermes/provision_callback_completed ]; then
     fi
 fi
 
-# Hooks and plugins are sandbox infrastructure, not agent data: replace them
-# with the image's copies on every start, e.g. after a restore or image update.
-rm -rf /home/agent/.hermes/hooks /home/agent/.hermes/plugins
-cp -a /home/agent/hermes-init/hooks /home/agent/hermes-init/plugins /home/agent/.hermes/
+# How each app/sandbox_env_default/hermes/ entry reaches the sandbox:
+#   AGENTS.md  provisioner -> /home/agent/AGENTS.md
+#   fork/      image -> /home/agent/hermes
+#   the rest   image -> hermes-init/ owned by copy-hermes-init.sh:
+#     hooks/, plugins/  every agent, on every start
+#     SOUL.md           every new agent
+#     env, config.yaml  the initial default agent only; new agents clone
+#                       its config.yaml
+copy-hermes-init.sh
 
 # Do not use chown -R on /home/agent/.hermes. Persisted Hermes dirs can grow
 # large. Also, Docker creates missing bind-mount source dirs as root:root, so

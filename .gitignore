@@ -19,5 +19,3 @@ __pycache__/
 npm-debug.log*
 yarn-error.log*
 .DS_Store
-hermes/profile.yaml
-hermes/profiles

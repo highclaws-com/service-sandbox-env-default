@@ -101,11 +101,11 @@ RUN cd hermes && \
     pip install --no-cache-dir -e ".[cli,messaging,cron,pty,feishu]" \
     "websockets==15.0.1" "python-socks==3.1.1" --break-system-packages
 
-# /home/agent/.hermes is a host mount, so the entrypoint copies these into it
-# on every start: /home/agent/hermes-init/{hooks,plugins} -> /home/agent/.hermes/
 COPY --chown=agent:agent ./hermes/hooks /home/agent/hermes-init/hooks
 COPY --chown=agent:agent ./hermes/plugins /home/agent/hermes-init/plugins
-COPY --chown=agent:agent ./hermes/SOUL.md /home/agent/SOUL.init.md
+COPY --chown=agent:agent ./hermes/SOUL.md /home/agent/hermes-init/SOUL.md
+COPY --chown=agent:agent ./hermes/env /home/agent/hermes-init/env
+COPY --chown=agent:agent ./hermes/config.yaml /home/agent/hermes-init/config.yaml
 
 # set up Supervisor
 USER root
@@ -114,9 +114,9 @@ COPY --chown=agent:agent home-ui-demo /home/agent/home-ui-demo
 # Copy the whole project, not only the build, so the agent can easily
 # customize it with the source code.
 COPY --chown=agent:agent --from=home-ui-builder /home-ui-default /home/agent/home-ui-default
-COPY sandbox-entrypoint.sh /usr/local/bin/sandbox-entrypoint.sh
-RUN chmod 0755 /usr/local/bin/sandbox-entrypoint.sh && \
-    ln -sf /home/agent/.local/bin/hermes /usr/local/bin/hermes && \
+COPY --chmod=0755 sandbox-entrypoint.sh /usr/local/bin/sandbox-entrypoint.sh
+COPY --chmod=0755 copy-hermes-init.sh /usr/local/bin/copy-hermes-init.sh
+RUN ln -sf /home/agent/.local/bin/hermes /usr/local/bin/hermes && \
     mkdir -p /var/log/supervisor /home/agent/.supervisor/conf.d && \
     chown -R agent:agent /home/agent/.supervisor
 
