@@ -1,6 +1,8 @@
 <template>
   <div v-if="open" class="veil">
     <div class="welcome" role="dialog" aria-modal="true">
+      <!-- Claw peeking over the dialog's top edge, as on the login page. -->
+      <img :src="clawImage" class="welcome-claw" :alt="t('claw_alt')">
       <span class="welcome-stamp">✂ DEMO</span>
       <LanguagePicker class="welcome-language" />
       <h2>{{ t('welcome_title') }}</h2>
@@ -17,6 +19,7 @@
 import { ref } from 'vue'
 import { useTranslation } from 'i18next-vue'
 import LanguagePicker from './LanguagePicker.vue'
+import clawImage from '../assets/cute-claw-normal.png'
 
 const { t } = useTranslation()
 

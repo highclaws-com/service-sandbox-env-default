@@ -10,6 +10,11 @@
           <strong v-if="agent" :style="{ color: agent.color }">{{ agent.name }}</strong>
         </div>
         <div class="tools">
+          <!-- Reloads the whole page, for views without browser controls,
+               e.g. the page embedded in an app or installed as a web app. -->
+          <button class="chip reload" :title="t('refresh')" @click="reload">
+            ↻ <span class="reload-label">{{ t('refresh') }}</span>
+          </button>
           <label class="chip select-chip" :title="t('theme')">
             🎨
             <select v-model="theme">
@@ -65,12 +70,19 @@ const drawer = ref(null)
 // Session list visibility on narrow screens.
 const menuOpen = ref(false)
 const loadError = ref('')
-const theme = ref(localStorage.getItem(THEME_KEY) || 'paper')
+// Theme passed by the Sandbox Management Console, mapped to a mood:
+// ?theme=dark -> 'night', ?theme=light -> 'paper'; absent -> undefined.
+const queryTheme = { dark: 'night', light: 'paper' }[
+  new URLSearchParams(window.location.search).get('theme')
+]
+const theme = ref(queryTheme || localStorage.getItem(THEME_KEY) || 'paper')
 
 watch(theme, (name) => {
   document.documentElement.dataset.theme = name
   localStorage.setItem(THEME_KEY, name)
 }, { immediate: true })
+
+const reload = () => window.location.reload()
 
 const toggle = (name) => { drawer.value = drawer.value === name ? null : name }
 

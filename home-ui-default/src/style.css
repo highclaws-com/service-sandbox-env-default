@@ -478,19 +478,26 @@ code, pre { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 0
 .tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
 .tab {
   display: flex;
+  flex: none;
   align-items: center;
-  gap: 6px;
-  max-width: 200px;
-  padding: 4px 10px;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  max-width: 220px;
   background: var(--tool);
   border: 2px solid var(--line);
   border-radius: 8px 8px 0 0;
 }
 .tab.on { background: var(--note); }
+.tab button { background: none; border: 0; }
+.tab-pick {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 4px 4px 4px 10px;
+}
+.tab-title { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .tab img { width: 14px; height: 14px; }
+.tab-close { padding: 4px 8px 4px 2px; color: var(--muted); }
+.tab-close:hover { color: #e5484d; }
 .screen {
   width: 100%;
   aspect-ratio: 4 / 3;
@@ -554,6 +561,18 @@ code, pre { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 0
   border: 3px double var(--accent);
   transform: rotate(8deg);
 }
+/* Sits on the dialog's top edge like on the login page; left of the stamp so
+   they do not overlap. The dialog's top margin keeps the claw on screen. */
+.welcome { margin-top: 82px; }
+.welcome-claw {
+  position: absolute;
+  top: -82px;
+  left: 40%;
+  width: 120px;
+  transform: translateX(-50%) rotate(1deg);
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.welcome-claw:hover { transform: translateX(-50%) rotate(1deg) scale(1.05); }
 .welcome-language { margin-bottom: 14px; }
 .check { display: flex; align-items: center; gap: 8px; margin: 18px 0; }
 
@@ -581,6 +600,10 @@ code, pre { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 0
     transition: transform 0.2s;
   }
   .shelf.open { transform: none; }
+  .reload { padding: 3px 7px; font-size: 13px; }
+  .reload-label { display: none; }
+  .welcome { margin-top: 75px; }
+  .welcome-claw { top: -75px; width: 110px; }
   .drawer, .drawer-wide {
     position: fixed;
     inset: 0 0 0 auto;

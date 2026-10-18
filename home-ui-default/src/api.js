@@ -94,6 +94,9 @@ export const listTabs = () => json('/web-browser/api/tabs')
 export const switchTab = (id) =>
   json(`/web-browser/api/switch-tab/${id}`, { method: 'POST' })
 
+export const closeTab = (id) =>
+  json(`/web-browser/api/close-tab/${id}`, { method: 'POST' })
+
 // File API paths omit the /worktrees prefix: '/' lists /worktrees.
 async function fileRequest(url, options) {
   const res = await fetch(url, options)

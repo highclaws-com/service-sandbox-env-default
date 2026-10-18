@@ -7,11 +7,13 @@
     </header>
     <p class="muted">{{ t('browser_hint') }}</p>
     <div class="tabs">
-      <button v-for="tab in tabs" :key="tab.id" class="tab" :class="{ on: tab.visible }"
-        :title="tab.url" @click="show(tab.id)">
-        <img v-if="tab.faviconUrl" :src="tab.faviconUrl" alt="">
-        {{ tab.title || tab.url }}
-      </button>
+      <div v-for="tab in tabs" :key="tab.id" class="tab" :class="{ on: tab.visible }">
+        <button class="tab-pick" :title="tab.url" @click="show(tab.id)">
+          <img v-if="tab.faviconUrl" :src="tab.faviconUrl" alt="">
+          <span class="tab-title">{{ tab.title || tab.url }}</span>
+        </button>
+        <button class="tab-close" :title="t('close_tab')" @click="close(tab.id)">✕</button>
+      </div>
     </div>
     <!-- Shared browser stream URI; keep unchanged. Shows the active tab.
          cast=1 hides the player's own controls but keeps mouse and keyboard
@@ -23,7 +25,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { useTranslation } from 'i18next-vue'
-import { listTabs, switchTab } from '../api'
+import { listTabs, switchTab, closeTab } from '../api'
 
 defineEmits(['close'])
 const { t } = useTranslation()
@@ -37,6 +39,11 @@ async function loadTabs() {
 
 async function show(id) {
   await switchTab(id)
+  await loadTabs()
+}
+
+async function close(id) {
+  await closeTab(id)
   await loadTabs()
 }
 

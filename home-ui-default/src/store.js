@@ -73,8 +73,14 @@ export async function loadSessions() {
 export async function selectProfile(id) {
   state.profile = id
   localStorage.setItem(PROFILE_KEY, id)
-  state.sessionId = null
   await loadSessions()
+  // Opens the profile's most recently active chat; a profile without chats
+  // opens a new chat. Pinned chats may be listed out of recency order.
+  const newest = state.sessions.reduce(
+    (a, b) => (b.last_active > a.last_active ? b : a),
+    state.sessions[0]
+  )
+  await openSession(newest?.id ?? null)
 }
 
 export async function openSession(id) {
