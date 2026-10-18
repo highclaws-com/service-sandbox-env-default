@@ -528,6 +528,16 @@ their memories and chats. For this reason, the Sandbox Management Console has
 no restore button, except in the dialog that creates a new sandbox, where there
 is nothing to overwrite yet.
 
+## Installing Large Tools
+Your `HOME` is inside your profile, and every agent backup copies it, except
+`.cache`. Consider installing a tool's program files under
+`$HOME/.cache/<tool>` to keep backups small. Check its installer for an
+install-directory variable, e.g.:
+```sh
+COMPOSIO_INSTALL_DIR="$HOME/.cache/composio" \
+  sh -c "$(curl -fsSL https://composio.dev/install)"
+```
+
 ## Note on Scheduled Task Timezones
 The `cronjob` tool accepts several schedule forms. Treat them differently:
 
