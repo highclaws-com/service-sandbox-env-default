@@ -9,12 +9,23 @@ mkdir -p \
     /var/log/supervisor
 chown -R agent:agent /home/agent/.supervisor
 
+# Do not use chown -R on /home/agent/.hermes. Persisted Hermes dirs can grow
+# large. Also, Docker creates missing bind-mount source dirs as root:root, so
+# fix the mountpoint directories Hermes need write to.
+chown agent:agent \
+    /home/agent/.hermes \
+    /home/agent/.hermes/.env \
+    /home/agent/.hermes/config.yaml \
+    /home/agent/.hermes/SOUL.md \
+    /home/agent/.hermes/profiles \
+    /home/agent/profile-staging || true
+
 # A missing marker means this is a fresh provision. Reset profiles before
 # gateways start so a local test cannot reuse the previous sandbox's agents.
 if [ ! -f /home/agent/.hermes/provision_callback_completed ]; then
     rm -rf /home/agent/.hermes/profiles/*
     : > /home/agent/.hermes/profile.yaml
-    copy-hermes-init.sh --seed /home/agent/.hermes
+    runuser -u agent -- env HOME=/home/agent copy-hermes-init.sh --seed /home/agent/.hermes
     # Seed the default home page as a normal user service. Never overwrite an
     # existing one: the user may have customized it or restored it from backup.
     if [ ! -e /home/agent/.supervisor/conf.d/home-ui-default.conf ]; then
@@ -31,18 +42,7 @@ fi
 #     hooks/, plugins/  every agent, on every start
 #     SOUL.md, config.yaml  every new agent
 #     env, cron job         the initial default agent only
-copy-hermes-init.sh --only-hooks-and-plugins
-
-# Do not use chown -R on /home/agent/.hermes. Persisted Hermes dirs can grow
-# large. Also, Docker creates missing bind-mount source dirs as root:root, so
-# fix the mountpoint directories Hermes need write to.
-chown agent:agent \
-    /home/agent/.hermes \
-    /home/agent/.hermes/.env \
-    /home/agent/.hermes/config.yaml \
-    /home/agent/.hermes/SOUL.md \
-    /home/agent/.hermes/profiles \
-    /home/agent/profile-staging || true
+runuser -u agent -- env HOME=/home/agent copy-hermes-init.sh --only-hooks-and-plugins
 
 if [ ! -f /home/agent/AGENTS.md ]; then
     echo "Missing required file: /home/agent/AGENTS.md" >&2

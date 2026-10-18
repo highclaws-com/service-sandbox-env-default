@@ -49,7 +49,7 @@ if [ "$#" -eq 2 ] && [ "$1" = --seed ]; then
     cp /home/agent/hermes-init/config.yaml "$agent_profile/config.yaml"
     if [ "$agent_profile" = /home/agent/.hermes ]; then
         cp /home/agent/hermes-init/env "$agent_profile/.env"
-        runuser -u agent -- env HOME=/home/agent HERMES_HOME="$agent_profile" \
+        HERMES_HOME="$agent_profile" \
             hermes cron create "0 10,15,20 * * *" --name bundled-job \
             "$bundled_job_prompt" --deliver all --failure-deliver local
     fi
