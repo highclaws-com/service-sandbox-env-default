@@ -1,12 +1,13 @@
 <template>
   <div class="room">
     <SessionList :class="{ open: menuOpen }" @picked="menuOpen = false" />
+    <!-- Shade behind the open session list on narrow screens; a tap closes the list. -->
+    <div v-if="menuOpen" class="shelf-shade" @click="menuOpen = false"></div>
 
     <main class="stage">
       <header class="topbar">
         <button class="chip menu-toggle" @click="menuOpen = !menuOpen">☰</button>
         <div class="stage-title">
-          <span class="sticker">{{ t('talking_to') }}</span>
           <strong v-if="agent" :style="{ color: agent.color }">{{ agent.name }}</strong>
         </div>
         <div class="tools">
