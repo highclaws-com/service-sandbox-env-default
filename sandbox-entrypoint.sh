@@ -30,7 +30,7 @@ fi
 #   the rest   image -> hermes-init/ owned by copy-hermes-init.sh:
 #     hooks/, plugins/  every agent, on every start
 #     SOUL.md, config.yaml  every new agent
-#     env                   the initial default agent only
+#     env, cron job         the initial default agent only
 copy-hermes-init.sh --only-hooks-and-plugins
 
 # Do not use chown -R on /home/agent/.hermes. Persisted Hermes dirs can grow
