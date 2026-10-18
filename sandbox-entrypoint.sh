@@ -24,7 +24,7 @@ chown agent:agent \
 # gateways start so a local test cannot reuse the previous sandbox's agents.
 if [ ! -f /home/agent/.hermes/provision_callback_completed ]; then
     rm -rf /home/agent/.hermes/profiles/*
-    : > /home/agent/.hermes/profile.yaml
+    rm -f /home/agent/.hermes/profile.yaml
     runuser -u agent -- env HOME=/home/agent copy-hermes-init.sh --seed /home/agent/.hermes
     # Seed the default home page as a normal user service. Never overwrite an
     # existing one: the user may have customized it or restored it from backup.
