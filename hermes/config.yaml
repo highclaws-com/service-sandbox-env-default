@@ -70,6 +70,10 @@ clarify:
   timeout: 120
 checkpoints:
   enabled: false
+cron:
+  # Deliver the raw job output to IM, without the
+  # "Cronjob Response: <name>\n(job_id: ...)\n---" header and footer.
+  wrap_response: false
 hooks_auto_accept: true
 plugins:
   enabled:
