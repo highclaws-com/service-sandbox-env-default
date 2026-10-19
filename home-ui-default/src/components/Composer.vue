@@ -60,11 +60,13 @@ async function choose(id) {
   await selectProfile(id)
 }
 
-// Textarea grows with its content up to the CSS max-height.
+// Textarea grows with its content up to the CSS max-height; only text
+// taller than that scrolls, e.g. 3 lines -> no scrollbar, 20 lines -> scrollbar.
 function grow() {
   const el = input.value
   el.style.height = 'auto'
   el.style.height = `${el.scrollHeight}px`
+  el.style.overflowY = el.scrollHeight > el.clientHeight ? 'auto' : 'hidden'
 }
 
 async function submit() {

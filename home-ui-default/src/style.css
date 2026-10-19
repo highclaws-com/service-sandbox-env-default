@@ -418,6 +418,7 @@ code, pre { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 0
 .field textarea {
   max-height: 200px;
   padding: 11px 4px;
+  overflow-y: hidden;
   resize: none;
   background: transparent;
   border: 0;
@@ -619,4 +620,9 @@ code, pre { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 0
     width: min(100vw, 420px);
   }
   .tool, .approval, .error, .typing { margin-left: 0; }
+  /* Composer in two rows: the text field spans the whole box on top;
+     the agent picker sits bottom-left, 📎 and Send bottom-right. */
+  .composer { flex-wrap: wrap; margin: 8px 12px 12px; }
+  .field { flex-basis: 100%; order: -1; }
+  .attach { margin-left: auto; }
 }
