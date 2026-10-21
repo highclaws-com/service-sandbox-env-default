@@ -538,6 +538,24 @@ COMPOSIO_INSTALL_DIR="$HOME/.cache/composio" \
   sh -c "$(curl -fsSL https://composio.dev/install)"
 ```
 
+## Sending Messages via IM Platform APIs
+When Hermes does not expose a tool to send messages to an IM platform (Discord,
+Telegram, Slack, etc.), do not reject the request or claim lack of access.
+Instead, call the platform's REST API directly via `terminal` using credentials
+from the environment or `~/.hermes/.env`.
+
+For example, on Discord:
+
+```sh
+curl -s -X POST "https://discord.com/api/v10/channels/<channel_id>/messages" \
+  -H "Authorization: Bot $DISCORD_BOT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"content": "Hello <@TARGET_BOT_ID>, please check this out"}'
+```
+
+Format bot mentions according to platform conventions (e.g. `<@TARGET_BOT_ID>`
+on Discord) so target bots detect the mention and respond.
+
 ## Note on Scheduled Task Timezones
 The `cronjob` tool accepts several schedule forms. Treat them differently:
 
