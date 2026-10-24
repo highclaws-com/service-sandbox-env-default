@@ -1,4 +1,4 @@
-FROM node:24-trixie-slim AS builder
+FROM node:24.22.1-trixie-slim AS builder
 
 # Install system dependencies: git, curl, ping, and build tools
 RUN apt-get update && apt-get install -y \
@@ -22,19 +22,19 @@ RUN npm install -g --no-audit --no-fund pnpm@11.1.3 && SHELL=bash pnpm setup
 # Build the agent-browser cli (customized)
 WORKDIR /agent-browser
 COPY browser-cli .
-RUN pnpm install && pnpm build:native
+RUN pnpm install --frozen-lockfile && pnpm build:native
 
 # Build the default sandbox home page
-FROM node:22-trixie-slim AS home-ui-builder
+FROM node:24.22.1-trixie-slim AS home-ui-builder
 WORKDIR /home-ui-default
 COPY home-ui-default/package.json home-ui-default/package-lock.json ./
 RUN npm ci --no-audit --no-fund
 COPY home-ui-default .
 RUN npm run build
 
-FROM node:22-trixie-slim AS node-runtime
+FROM node:24.22.1-trixie-slim AS node-runtime
 
-FROM python:3.14.7-slim-trixie
+FROM python:3.14.9-slim-trixie
 COPY --from=node-runtime /usr/local/ /usr/local/
 
 # Install system dependencies and frequent tools available to AI agents.
@@ -77,7 +77,7 @@ COPY --from=builder /agent-browser/cli/target/release/agent-browser /usr/local/b
 
 # Install search-cli
 COPY search-cli /opt/search-cli
-RUN cd /opt/search-cli/src && npm install --no-audit --no-fund \
+RUN cd /opt/search-cli/src && npm ci --no-audit --no-fund \
     && rm -rf /root/.npm \
     && chmod +x search-cli.js \
     && ln -s /opt/search-cli/src/search-cli.js /usr/local/bin/search-cli
@@ -97,9 +97,15 @@ WORKDIR /home/agent
 ENV PATH="/home/agent/.local/bin:${PATH}"
 COPY --chown=agent:agent ./hermes/fork /home/agent/hermes
 COPY --chown=agent:agent ./hermes/install-stamp.json /home/agent/hermes/install-stamp.json
+# Install the exact versions in hermes/uv.lock into /home/agent/hermes/.venv.
+# uv, not pip: the lock carries uv overrides (e.g. pillow over
+# browser-harness's pin) that pip's resolver would reject.
+# python-socks 3.1.1 is for the NaoNao plugin; the lock holds 2.8.2.
 RUN cd hermes && \
-    pip install --no-cache-dir -e ".[cli,messaging,cron,pty,feishu]" \
-    "websockets==15.0.1" "python-socks==3.1.1" --break-system-packages
+    pip install --no-cache-dir --break-system-packages uv==0.13.5 && \
+    uv sync --frozen --no-dev --no-cache \
+        --extra messaging --extra cron --extra pty --extra feishu && \
+    uv pip install --no-cache "python-socks==3.1.1"
 
 COPY --chown=agent:agent ./hermes/hooks /home/agent/hermes-init/hooks
 COPY --chown=agent:agent ./hermes/plugins /home/agent/hermes-init/plugins
@@ -116,7 +122,7 @@ COPY --chown=agent:agent home-ui-demo /home/agent/home-ui-demo
 COPY --chown=agent:agent --from=home-ui-builder /home-ui-default /home/agent/home-ui-default
 COPY --chmod=0755 sandbox-entrypoint.sh /usr/local/bin/sandbox-entrypoint.sh
 COPY --chmod=0755 copy-hermes-init.sh /usr/local/bin/copy-hermes-init.sh
-RUN ln -sf /home/agent/.local/bin/hermes /usr/local/bin/hermes && \
+RUN ln -sf /home/agent/hermes/.venv/bin/hermes /usr/local/bin/hermes && \
     mkdir -p /var/log/supervisor /home/agent/.supervisor/conf.d && \
     chown -R agent:agent /home/agent/.supervisor
 
