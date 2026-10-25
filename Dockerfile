@@ -107,6 +107,8 @@ RUN cd hermes && \
         --extra messaging --extra cron --extra pty --extra feishu && \
     uv pip install --no-cache "python-socks==3.1.1"
 
+ENV PATH="/home/agent/hermes/.venv/bin:${PATH}"
+
 COPY --chown=agent:agent ./hermes/hooks /home/agent/hermes-init/hooks
 COPY --chown=agent:agent ./hermes/plugins /home/agent/hermes-init/plugins
 COPY --chown=agent:agent ./hermes/SOUL.md /home/agent/hermes-init/SOUL.md
@@ -122,8 +124,7 @@ COPY --chown=agent:agent home-ui-demo /home/agent/home-ui-demo
 COPY --chown=agent:agent --from=home-ui-builder /home-ui-default /home/agent/home-ui-default
 COPY --chmod=0755 sandbox-entrypoint.sh /usr/local/bin/sandbox-entrypoint.sh
 COPY --chmod=0755 copy-hermes-init.sh /usr/local/bin/copy-hermes-init.sh
-RUN ln -sf /home/agent/hermes/.venv/bin/hermes /usr/local/bin/hermes && \
-    mkdir -p /var/log/supervisor /home/agent/.supervisor/conf.d && \
+RUN mkdir -p /var/log/supervisor /home/agent/.supervisor/conf.d && \
     chown -R agent:agent /home/agent/.supervisor
 
 WORKDIR /worktrees
