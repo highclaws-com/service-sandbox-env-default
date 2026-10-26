@@ -10,5 +10,6 @@
 	url = https://github.com/highclaws-com/hermes-agent-fork.git
 [submodule "hermes/plugins/naonao"]
 	path = hermes/plugins/naonao
-	url = https://github.com/0xzeshawn/hermes-naonao-plugin.git
+	url = https://github.com/w32zhong/hermes-naonao-plugin.git
+	branch = fix-highclaws
 	ignore = untracked
