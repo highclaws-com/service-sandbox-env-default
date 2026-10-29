@@ -24,6 +24,18 @@ WORKDIR /agent-browser
 COPY browser-cli .
 RUN pnpm install --frozen-lockfile && pnpm build:native
 
+# Build the Buzz cli, the binary the Buzz messaging platform shells out to.
+# The toolchain matches the pinned release's rust-toolchain.toml.
+FROM rust:1.95.0-slim-trixie AS buzz-builder
+ARG BUZZ_VERSION=desktop-v0.5.28
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+RUN git clone --depth 1 --branch ${BUZZ_VERSION} https://github.com/block/buzz.git /buzz
+WORKDIR /buzz
+RUN cargo build --release --locked -p buzz-cli
+
 # Build the default sandbox home page
 FROM node:24.22.1-trixie-slim AS home-ui-builder
 WORKDIR /home-ui-default
@@ -74,6 +86,11 @@ RUN npm install -g --no-audit --no-fund pnpm@9.15.9 && rm -rf /root/.npm && SHEL
 
 # Only keep the rust build binary as requested
 COPY --from=builder /agent-browser/cli/target/release/agent-browser /usr/local/bin/agent-browser
+
+# The Buzz cli backs the Buzz messaging platform: the Hermes adapter shells
+# out to it for every outbound message and for the polling fallback.
+COPY --from=buzz-builder /buzz/target/release/buzz /usr/local/bin/buzz
+COPY --from=buzz-builder /buzz/LICENSE /usr/share/licenses/buzz-cli/LICENSE
 
 # Install search-cli
 COPY search-cli /opt/search-cli
