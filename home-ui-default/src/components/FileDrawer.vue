@@ -1,10 +1,5 @@
 <template>
-  <aside class="drawer">
-    <header class="drawer-head">
-      <h2>🗂️ {{ t('files') }}</h2>
-      <button class="chip" :title="t('refresh')" @click="load">↻</button>
-      <button class="chip" :title="t('close')" @click="$emit('close')">✕</button>
-    </header>
+  <SideDrawer :title="`🗂️ ${t('files')}`" @refresh="load" @close="$emit('close')">
     <div class="crumbs">
       <button class="chip" :disabled="dir === '/'" @click="open(parent)">⬑ {{ t('up') }}</button>
       <code>/worktrees{{ dir === '/' ? '' : dir }}</code>
@@ -21,13 +16,14 @@
     <figure v-if="image" class="file-peek">
       <img :src="image" alt="">
     </figure>
-  </aside>
+  </SideDrawer>
 </template>
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { useTranslation } from 'i18next-vue'
 import { listFiles, fileContentUrl, filePreviewUrl } from '../api'
+import SideDrawer from './SideDrawer.vue'
 
 defineEmits(['close'])
 const { t } = useTranslation()

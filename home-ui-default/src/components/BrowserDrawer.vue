@@ -1,10 +1,5 @@
 <template>
-  <aside class="drawer drawer-wide">
-    <header class="drawer-head">
-      <h2>🖥️ {{ t('browser') }}</h2>
-      <button class="chip" :title="t('refresh')" @click="loadTabs">↻</button>
-      <button class="chip" :title="t('close')" @click="$emit('close')">✕</button>
-    </header>
+  <SideDrawer :title="`🖥️ ${t('browser')}`" @refresh="loadTabs" @close="$emit('close')">
     <p class="muted">{{ t('browser_hint') }}</p>
     <div ref="strip" class="tabs" @wheel="onWheel">
       <div v-for="tab in tabs" :key="tab.id" class="tab" :class="{ on: tab.visible }">
@@ -20,7 +15,7 @@
          cast=1 hides the player's own controls but keeps mouse and keyboard
          input; mute_chat=1 disables chat sounds. -->
     <iframe class="screen" src="/web-browser-webrtc/?cast=1&mute_chat=1"></iframe>
-  </aside>
+  </SideDrawer>
 </template>
 
 <script setup>
@@ -28,6 +23,7 @@ import { nextTick, onMounted, ref } from 'vue'
 import i18next from 'i18next'
 import { useTranslation } from 'i18next-vue'
 import { listTabs, switchTab, closeTab, newTab } from '../api'
+import SideDrawer from './SideDrawer.vue'
 
 defineEmits(['close'])
 const { t } = useTranslation()

@@ -450,18 +450,49 @@ code, pre { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 0
 .send.stop { background: #e5484d; color: #fff; }
 
 /* ---------- Right drawers ---------- */
+/* Every drawer shares one width. --drawer-w is set by dragging the left edge
+   (SideDrawer.vue); the clamp keeps it between 320px and whatever leaves the
+   chat list (290px) and at least 360px of chat visible. */
 .drawer {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  width: 340px;
+  width: clamp(320px, var(--drawer-w, 40vw), calc(100vw - 650px));
+  min-width: 320px;
   padding: 16px;
-  overflow-y: auto;
   background: var(--panel);
   border-left: 3px solid var(--line);
   animation: slide 0.2s ease-out;
 }
-.drawer-wide { width: min(640px, 42vw); }
+.drawer-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+  overflow-y: auto;
+}
+.drawer-grip {
+  position: absolute;
+  inset: 0 auto 0 -6px;
+  z-index: 1;
+  width: 10px;
+  cursor: col-resize;
+  touch-action: none;
+}
+.drawer-grip::after {
+  content: "";
+  position: absolute;
+  inset: 0 3px 0 4px;
+  background: var(--accent);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.drawer-grip:hover::after, .resizing .drawer-grip::after { opacity: 1; }
+/* While dragging: no text selection, and iframes can't eat pointer events. */
+.resizing { cursor: col-resize; user-select: none; }
+.resizing iframe { pointer-events: none; }
 .drawer-head { display: flex; align-items: center; gap: 8px; }
 .drawer-head h2 { flex: 1; margin: 0; font: 900 20px Georgia, serif; }
 .drawer p { margin: 0; }
@@ -648,12 +679,15 @@ code, pre { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 0
   .reload-label { display: none; }
   .welcome { margin-top: 75px; }
   .welcome-claw { top: -75px; width: 110px; }
-  .drawer, .drawer-wide {
+  /* Drawers become a fixed overlay; the dragged width doesn't apply here. */
+  .drawer {
     position: fixed;
     inset: 0 0 0 auto;
     z-index: 6;
     width: min(100vw, 420px);
+    min-width: 0;
   }
+  .drawer-grip { display: none; }
   .tool, .approval, .error, .typing { margin-left: 0; }
   /* Composer in two rows: the text field spans the whole box on top;
      the agent picker sits bottom-left, 📎 and Send bottom-right. */
