@@ -97,6 +97,10 @@ export const switchTab = (id) =>
 export const closeTab = (id) =>
   json(`/web-browser/api/close-tab/${id}`, { method: 'POST' })
 
+// colorScheme: 'light' | 'dark'; language: e.g. 'en-US'. -> {id, ...}
+export const newTab = (url, colorScheme, language) =>
+  json('/web-browser/api/new-tab', withJson('POST', { url, colorScheme, language }))
+
 // File API paths omit the /worktrees prefix: '/' lists /worktrees.
 async function fileRequest(url, options) {
   const res = await fetch(url, options)
