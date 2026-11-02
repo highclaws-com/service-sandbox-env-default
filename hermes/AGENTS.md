@@ -385,12 +385,12 @@ capabilities.
   only the necessary local actions, one step at a time. Do not assume they know
   how to use a terminal.
 - `hc` must be installed on the target computer for every use case in this
-  section. For SSH-based access, including CUA and Guacamole, do not proceed
-  until the reverse tunnel is running. If another computer is already using
-  that tunnel, use `hc expose tcp:22` and bridge its hostname with
-  `cloudflared access tcp` on a different local port. Remind the user that
-  `hc expose tcp:22` must only be temporary and is unsafe because it exposes
-  their SSH port publicly.
+  section and in Remote Control of User Computers. For SSH-based access,
+  including remote control, do not proceed until the reverse tunnel is running.
+  If another computer is already using that tunnel, fallback to `hc expose tcp:22`
+  and bridge its hostname with `cloudflared access tcp` on a different local port.
+  Remind the user that `hc expose tcp:22` must only be temporary and is unsafe
+  because it exposes their SSH port publicly.
 
 If you receive a Cloudflare tunnel address, such as a `*.trycloudflare.com`
 hostname, it may be a tunnel the user exposed with `hc expose` on their own.
@@ -409,15 +409,31 @@ To check the state:
 - `GET http://sandbox_mgr:8000/api/v1/browser/egress-connect`: `healthy` is
   true when the egress proxy is reachable.
 
-Exposing the user's SSH service lets the agent work on the computer: SSH for
-normal operations, and CUA for tasks that need the graphical desktop.
+## Remote Control of User Computers
+Once the user's SSH service is reachable through the reverse tunnel (see
+Connecting to User Local Devices), you can work on their computer: SSH for
+normal operations, and computer use for tasks that need the graphical desktop.
+
+Install and run computer-use tools on the user's computer over SSH, not in
+this sandbox. Pick one by the task:
+
+- **agent-desktop** (default), `https://github.com/vercel-labs/agent-desktop`:
+  for apps whose controls show up in the OS accessibility tree, when the task
+  is about what the UI says and does (clicking, typing, menus, forms,
+  settings, reading text) rather than how it looks.
+- **CUA** (computer-use agent: screenshots plus mouse and keyboard at screen
+  coordinates), `https://github.com/trycua/cua`: when the accessibility tree
+  is missing or does not show what you need (custom-drawn or canvas UIs,
+  games, remote screens such as VMs or a KVM window), when the task depends
+  on how things look (images, video, layout, charts), or when it needs precise
+  pointer work (drawing, dragging on timelines or canvases).
 
 For the user to access their own computer's desktop or to monitor the agent's
 actions, there is a Guacamole remote desktop, served at `SANDBOX_ROOT_URL/desktop/` as
 an optional sidecar container (the Guacamole web app plus its guacd proxy), off
 by default to save memory. So when the user says something like "I have enabled
 the Guacamole remote desktop service on this sandbox, please help me configure
-it", the Guacamole sidecar is already configured. Focus on the SSH path above
+it", the Guacamole sidecar is already configured. Focus on the SSH connection
 and the desktop service on their computer if needed (RDP on Windows, VNC on
 macOS and Linux). When everything is ready, the user does the remote desktop at
 `SANDBOX_ROOT_URL/desktop/`, unless they want to expose it to a public URL
