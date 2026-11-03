@@ -132,8 +132,18 @@ COPY --chown=agent:agent ./hermes/SOUL.md /home/agent/hermes-init/SOUL.md
 COPY --chown=agent:agent ./hermes/env /home/agent/hermes-init/env
 COPY --chown=agent:agent ./hermes/config.yaml /home/agent/hermes-init/config.yaml
 
-# set up Supervisor
 USER root
+# The agent's terminal runs a login shell, and /etc/profile resets PATH, which
+# drops the ENV PATH entries above. Link those CLIs into /usr/local/bin so they
+# resolve in any shell and under any profile HOME.
+RUN ln -s /home/agent/hermes/.venv/bin/hermes \
+          /home/agent/hermes/.venv/bin/hermes-acp \
+          /home/agent/hermes/.venv/bin/hermes-agent \
+          /home/agent/.local/bin/uv \
+          /home/agent/.local/bin/uvx \
+          /usr/local/bin/
+
+# set up Supervisor
 COPY supervisor/ /etc/supervisor/
 COPY --chown=agent:agent home-ui-demo /home/agent/home-ui-demo
 # Copy the whole project, not only the build, so the agent can easily
