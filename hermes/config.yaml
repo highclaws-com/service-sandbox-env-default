@@ -32,8 +32,6 @@ agent:
   - image_gen
   - tts
   - clarify
-  - homeassistant
-  - kanban
 goals:
   max_turns: 5000
 memory:
@@ -101,6 +99,7 @@ platform_toolsets:
   - code_execution
   - delegation
   - vision
+  - kanban
 stt:
   # "" = auto-detect an input language, e.g., "en", "zh".
   language: ''
