@@ -65,6 +65,7 @@ RUN apt-get update && apt-get install -y \
     openssh-client \
     openssh-server \
     sshpass \
+    unzip \
     && rm -rf /var/lib/apt/lists/*
 
 # The user's `ssh -R` logs in as `tunnel`; "*" = no password, keys still work.
@@ -83,6 +84,17 @@ RUN mkdir -p --mode=0755 /usr/share/keyrings && \
 ENV PNPM_HOME="/root/.local/share/pnpm"
 ENV PATH="${PNPM_HOME}:${PATH}"
 RUN npm install -g --no-audit --no-fund pnpm@9.15.9 && rm -rf /root/.npm && SHELL=bash pnpm setup
+
+# Password manager CLIs: the console's Passwords tab logs them in per agent, and
+# Hermes' vault backends drive them (bw for Bitwarden, op for 1Password).
+ARG BITWARDEN_CLI_VERSION=2026.10.1
+ARG ONEPASSWORD_CLI_VERSION=2.41.1
+RUN npm install -g --no-audit --no-fund @bitwarden/cli@${BITWARDEN_CLI_VERSION} && rm -rf /root/.npm
+RUN arch="$(dpkg --print-architecture)" && \
+    curl -fsSL -o /tmp/op.zip \
+      "https://cache.agilebits.com/dist/1P/op2/pkg/v${ONEPASSWORD_CLI_VERSION}/op_linux_${arch}_v${ONEPASSWORD_CLI_VERSION}.zip" && \
+    unzip -o /tmp/op.zip op -d /usr/local/bin && chmod 0755 /usr/local/bin/op && \
+    rm -f /tmp/op.zip
 
 # Only keep the rust build binary as requested
 COPY --from=builder /agent-browser/cli/target/release/agent-browser /usr/local/bin/agent-browser
