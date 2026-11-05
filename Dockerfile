@@ -72,13 +72,11 @@ RUN apt-get update && apt-get install -y \
 RUN useradd --system --no-create-home --shell /usr/sbin/nologin \
     --password '*' tunnel
 
-# Install cloudflared from Cloudflare's apt repository.
-RUN mkdir -p --mode=0755 /usr/share/keyrings && \
-    curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg > /usr/share/keyrings/cloudflare-main.gpg && \
-    echo "deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared any main" > /etc/apt/sources.list.d/cloudflared.list && \
-    apt-get update && \
-    apt-get install -y cloudflared && \
-    rm -rf /var/lib/apt/lists/*
+# cloudflared from the GitHub release (the apt repo only keeps the latest version).
+ARG CLOUDFLARED_VERSION=2026.10.7
+RUN curl -fsSL -o /tmp/cloudflared.deb \
+      "https://github.com/cloudflare/cloudflared/releases/download/${CLOUDFLARED_VERSION}/cloudflared-linux-$(dpkg --print-architecture).deb" && \
+    dpkg -i /tmp/cloudflared.deb && rm -f /tmp/cloudflared.deb
 
 # Install pnpm
 ENV PNPM_HOME="/root/.local/share/pnpm"
