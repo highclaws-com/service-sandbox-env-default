@@ -504,10 +504,11 @@ Find the item's id (and, for `op`, its vault; `bw list items` includes
 passwords, so print only id and name):
 ```sh
 op item list | grep -i grafana
-bw list items --search grafana | jq '.[] | {id, name}'
+# prefer --nointeraction for bw, or it hangs when the session expires
+bw list items --search grafana --nointeraction | jq '.[] | {id, name}'
 ```
 
-Read the password if `op` is enabled (for Bitwarden: `pw=$(bw get password <id>)`):
+Read the password if `op` is enabled (for Bitwarden: `pw=$(bw get password <id> --nointeraction)`):
 ```sh
 pw=$(op item get <id> --vault <vault> --fields password --reveal 2>/dev/null)
 ```
