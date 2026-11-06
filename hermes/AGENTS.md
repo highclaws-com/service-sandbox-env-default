@@ -489,14 +489,14 @@ with that profile's own tools:
 hermes -p <profile-id> chat -q "Set a reminder for one minute from now: buy groceries"
 ```
 
-## Password Managers
-Enabled password managers for your profile (`OnePassword` = `op`,
+## Password Vaults
+Password vaults your profile can use (`OnePassword` = `op`,
 `Bitwarden` = `bw`; both CLIs are installed regardless):
 ```sh
 curl -s "http://sandbox_mgr:8000/api/v1/passwords?profile=<your-profile-id>"
 ```
-If none is listed, ask the user to connect one in the Sandbox Management
-Console.
+If none is listed, ask the user to connect one under Password Vaults in the
+Sandbox Management Console and grant you access.
 
 Below is an example to log in to `grafana.example.com`.
 
