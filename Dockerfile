@@ -59,6 +59,7 @@ RUN apt-get update && apt-get install -y \
     wget \
     sudo \
     ripgrep \
+    jq \
     iproute2 \
     procps \
     supervisor \

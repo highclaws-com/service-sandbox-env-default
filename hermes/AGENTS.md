@@ -489,6 +489,52 @@ with that profile's own tools:
 hermes -p <profile-id> chat -q "Set a reminder for one minute from now: buy groceries"
 ```
 
+## Password Managers
+Enabled password managers for your profile (`OnePassword` = `op`,
+`Bitwarden` = `bw`; both CLIs are installed regardless):
+```sh
+curl -s "http://sandbox_mgr:8000/api/v1/passwords?profile=<your-profile-id>"
+```
+If none is listed, ask the user to connect one in the Sandbox Management
+Console.
+
+Below is an example to log in to `grafana.example.com`.
+
+Find the item's id (and, for `op`, its vault; `bw list items` includes
+passwords, so print only id and name):
+```sh
+op item list | grep -i grafana
+bw list items --search grafana | jq '.[] | {id, name}'
+```
+
+Read the password if `op` is enabled (for Bitwarden: `pw=$(bw get password <id>)`):
+```sh
+pw=$(op item get <id> --vault <vault> --fields password --reveal 2>/dev/null)
+```
+
+For a plain username/password form, prefer `auth login`: it fills and submits
+in one step, so the password never reaches you. Save once, reuse later:
+```sh
+export AGENT_BROWSER_SESSION=grafana AGENT_BROWSER_PIN_TAB=1
+# save the login encrypted under the name "grafana"
+printf '%s' "$pw" | agent-browser auth save grafana --password-stdin \
+  --url "https://grafana.example.com/login" --username app_admin
+# open the URL, guess the user/password fields and submit button, fill, click
+agent-browser auth login grafana
+# if a field isn't found, pass its selector:
+agent-browser auth login grafana --username-selector 'input[name="user"]'
+```
+
+For other forms, fill them yourself (`$pw` works for any other command too,
+e.g. `SSHPASS="$pw" sshpass -e ssh ...`):
+```sh
+agent-browser fill 'input[name="user"]' 'app_admin'
+agent-browser fill 'input[name="password"]' "$pw"
+agent-browser click 'button[type="submit"]'
+```
+
+Run `unset pw` when done.
+
 ## Profile Backup and Restore
 Agent profiles hold personas, memories, sessions, skills, etc. The browser
 profile holds website logins, etc. When the user asks to back up or restore
