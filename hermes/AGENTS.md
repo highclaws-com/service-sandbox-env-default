@@ -534,6 +534,11 @@ agent-browser fill 'input[name="password"]' "$pw"
 agent-browser click 'button[type="submit"]'
 ```
 
+After submitting, check the login worked, not by exit code or output: run
+`agent-browser snapshot` (the page structure) and look for signed-in-only
+elements, e.g., an account name or logout link. Check it before `get url`,
+which may show the password.
+
 Run `unset pw` when done.
 
 ## Profile Backup and Restore
