@@ -84,7 +84,7 @@ ENV PNPM_HOME="/root/.local/share/pnpm"
 ENV PATH="${PNPM_HOME}:${PATH}"
 RUN npm install -g --no-audit --no-fund pnpm@9.15.9 && rm -rf /root/.npm && SHELL=bash pnpm setup
 
-# Password manager CLIs: the console's Passwords tab logs them in per agent, and
+# Password manager CLIs: the console logs them in per agent, and
 # Hermes' vault backends drive them (bw for Bitwarden, op for 1Password).
 ARG BITWARDEN_CLI_VERSION=2026.10.1
 ARG ONEPASSWORD_CLI_VERSION=2.41.1
