@@ -482,6 +482,11 @@ profile's config is at `/home/agent/.hermes/`, a named profile's at
 `/home/agent/.hermes/profiles/<profile id>/` (`profile.yaml` metadata,
 `SOUL.md` persona).
 
+Run the Hermes CLI as `hermes`, found on your `PATH`. Do not run
+`python3 -m hermes_cli` or `/home/agent/hermes/hermes`: both use the system
+Python, which lacks Hermes's dependencies (`ModuleNotFoundError`). Do not
+prepend `HOME=...` either; `hermes` already uses your own profile.
+
 To message another agent or drive it to do something (e.g. set up a cronjob),
 send it a one-shot query by passing its profile id to `-p`; it runs the request
 with that profile's own tools:
@@ -596,7 +601,9 @@ their memories and chats. For this reason, the Sandbox Management Console has
 no restore button, except in the dialog that creates a new sandbox, where there
 is nothing to overwrite yet.
 
-## Installing Large Tools
+## Installing Your Own Tools
+Install what you need under your own `HOME`; do not borrow another agent's `HOME`.
+
 Your `HOME` is inside your profile, and every agent backup copies it, except
 `.cache`. Consider installing a tool's program files under
 `$HOME/.cache/<tool>` to keep backups small. Check its installer for an
