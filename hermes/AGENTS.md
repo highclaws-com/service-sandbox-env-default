@@ -47,25 +47,33 @@ verdict the user reaches in one look.
 Keep your own tests and checks; skip only the check whose cost is lopsided,
 e.g., a long chain of steps for you from inside the sandbox, one look for the user.
 
-## Web Development
-This sandbox reserves the internal TCP port range `8000-8080` for public
-exposure, so the outside world can visit services listening on any port in that
-range. The public port numbers MAY BE DIFFERENT from the internal port numbers.
-In Docker port notation, the assigned public mapping for this sandbox is:
+## Exposing Services
+Services you run listen on local ports (`localhost:<port>`) and are not
+reachable from the internet by default. Use one of these methods to let the
+user reach a service:
 
-```txt
-{{PUBLIC_PORT_8000}}-{{PUBLIC_PORT_8080}}:8000-8080
-```
+- **HTTP/HTTPS via Cloudflare:** use the pre-installed `cloudflared` CLI with
+  a user-owned domain, or a Quick Tunnel for a temporary URL.
+- **TCP via Cloudflare:** run
+  `cloudflared tunnel --url tcp://127.0.0.1:<service-port>` on this sandbox;
+  it prints the tunnel name. On the user's device, run
+  `cloudflared access tcp --hostname <tunnel-name> --url 127.0.0.1:<free-port>`,
+  where `<free-port>` is a free port on the user's device, then connect to
+  `127.0.0.1:<free-port>`.
+- **Forward TCP Tunnel:** `2023` is the fixed TCP port reserved for a service
+  that only the user should reach. The user reaches it through an encrypted
+  tunnel they open from their device with the HighClaws CLI, using the
+  Sandbox Endpoint from Safe Connect in the Sandbox Management Console. This
+  tunnel is protected and obfuscated such that no man in the middle can
+  easily tell which port or service the user is reaching.
+- **UDP via static NAT:** only fixed UDP ports are directly published for
+  user services: `{{PUBLIC_PORT_8000}}-{{PUBLIC_PORT_8080}}:8000-8080/udp`
+  (public:internal). Look up this sandbox's public IP from a well-known IP
+  address lookup service, e.g. `curl https://ifconfig.me`, then give the user
+  that address with the mapped public port to connect to.
 
-When reporting to the user, find this sandbox's public IP via a well-known IP
-address lookup service, then present a full public URL with the mapped public
-web port. For example, if you run a demo on internal port `8080`, report
-`http://<public-ip>:{{PUBLIC_PORT_8080}}/`. Your user is likely non-technical,
-so a full URL in the IM message helps them click and view the result.
-
-Public mapped URLs also work from inside the sandbox through hairpin NAT. For
-sandbox-local access, prefer `http://sandbox_env:<internal-port>` because it is
-the more direct route.
+Bind services to `0.0.0.0`; no service runs on 2023 by default. Configure
+application authentication as needed.
 
 ## Sandbox Home Page
 `SANDBOX_ROOT_URL/` is the user's private home page, open only to the
@@ -93,7 +101,7 @@ or language.
 
 ## Web Browser
 This sandbox is connected to a side-car browser over Docker bridge network.
-The browser runs in the `web_browser` service, a sidecar container to your
+The browser runs in the `web_browser` service, a **sidecar** container to your
 agent container. `agent-browser` connects to it at `$AGENT_BROWSER_CDP`.
 
 When running local web servers (dev servers, static file servers, demo sites,
@@ -369,6 +377,9 @@ memory is limited, so first check for and reuse any existing tool process and
 tunnel instead of starting duplicates.
 
 ## Connecting to User Local Devices
+The Reverse SSH Tunnel uses sandbox TCP 2022. It lets the sandbox reach
+the user's computer through the SSH forward on sandbox loopback TCP 2222.
+
 Help the user connect their local computer to this sandbox using the HighClaws
 CLI — `hc` — from `https://github.com/highclaws-com/cli`: to synchronize local
 files, run the egress proxy on their computer, expose one
@@ -439,7 +450,7 @@ this sandbox. Pick one by the task:
 
 For the user to access their own computer's desktop or to monitor the agent's
 actions, there is a Guacamole remote desktop, served at `SANDBOX_ROOT_URL/desktop/` as
-an optional sidecar container (the Guacamole web app plus its guacd proxy), off
+an optional **sidecar** container (the Guacamole web app plus its guacd proxy), off
 by default to save memory. So when the user says something like "I have enabled
 the Guacamole remote desktop service on this sandbox, please help me configure
 it", the Guacamole sidecar is already configured. Focus on the SSH connection
