@@ -368,6 +368,11 @@ code, pre { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 0
   box-shadow: var(--shadow);
 }
 
+.composer.drag-over {
+  border-color: var(--accent);
+  background: var(--note);
+}
+
 .who { position: relative; }
 .who-button {
   display: grid;

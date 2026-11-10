@@ -1,5 +1,13 @@
 <template>
-  <form class="composer" @submit.prevent="submit">
+  <form
+    class="composer"
+    :class="{ 'drag-over': dragDepth > 0 }"
+    @submit.prevent="submit"
+    @dragenter="dragEnter"
+    @dragover="dragOver"
+    @dragleave="dragDepth = Math.max(0, dragDepth - 1)"
+    @drop="drop"
+  >
     <!-- Profile picker: who this message goes to. -->
     <div class="who">
       <button type="button" class="who-button" :title="t('talking_to')" @click="pickerOpen = !pickerOpen">
@@ -52,8 +60,34 @@ const busy = computed(() => Boolean(state.runs[state.sessionId]))
 const text = ref('')
 // File picked to attach to the next message.
 const file = ref(null)
+const dragDepth = ref(0)
 const pickerOpen = ref(false)
 const input = ref(null)
+
+function dragEnter(event) {
+  if (event.dataTransfer.types.includes('Files')) {
+    event.preventDefault()
+    dragDepth.value += 1
+  }
+}
+
+function dragOver(event) {
+  if (event.dataTransfer.types.includes('Files')) {
+    event.preventDefault()
+    event.dataTransfer.dropEffect = 'copy'
+  }
+}
+
+function drop(event) {
+  dragDepth.value = 0
+  if (event.dataTransfer.types.includes('Files')) {
+    event.preventDefault()
+    if (event.dataTransfer.files.length) {
+      file.value = event.dataTransfer.files[0]
+      input.value.focus()
+    }
+  }
+}
 
 async function choose(id) {
   pickerOpen.value = false

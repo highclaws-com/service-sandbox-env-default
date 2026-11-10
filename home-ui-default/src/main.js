@@ -19,6 +19,7 @@ import pt from './locales/pt-BR.json'
 // ?lang=zh-CN, then cookie, then localStorage, then the browser language.
 i18next.use(LanguageDetector).init({
   fallbackLng: 'en-US',
+  interpolation: { escapeValue: false },
   resources: {
     'en-US': { translation: en },
     'de-DE': { translation: de },
