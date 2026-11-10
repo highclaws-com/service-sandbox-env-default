@@ -63,7 +63,7 @@ user reach a service:
 - **Forward TCP Tunnel:** `2023` is the fixed TCP port reserved for a service
   that only the user should reach. The user reaches it through an encrypted
   tunnel they open from their device with the HighClaws CLI, using the
-  Sandbox Endpoint from Safe Connect in the Sandbox Management Console. This
+  Sandbox Access Code from Safe Connect in the Sandbox Management Console. This
   tunnel is protected and obfuscated such that no man in the middle can
   easily tell which port or service the user is reaching.
 - **UDP via static NAT:** only fixed UDP ports are directly published for
