@@ -47,34 +47,6 @@ verdict the user reaches in one look.
 Keep your own tests and checks; skip only the check whose cost is lopsided,
 e.g., a long chain of steps for you from inside the sandbox, one look for the user.
 
-## Exposing Services
-Services you run listen on local ports (`localhost:<port>`) and are not
-reachable from the internet by default. Use one of these methods to let the
-user reach a service:
-
-- **HTTP/HTTPS via Cloudflare:** use the pre-installed `cloudflared` CLI with
-  a user-owned domain, or a Quick Tunnel for a temporary URL.
-- **TCP via Cloudflare:** run
-  `cloudflared tunnel --url tcp://127.0.0.1:<service-port>` on this sandbox;
-  it prints the tunnel name. On the user's device, run
-  `cloudflared access tcp --hostname <tunnel-name> --url 127.0.0.1:<free-port>`,
-  where `<free-port>` is a free port on the user's device, then connect to
-  `127.0.0.1:<free-port>`.
-- **Forward TCP Tunnel:** `2023` is the fixed TCP port reserved for a service
-  that only the user should reach. The user reaches it through an encrypted
-  tunnel they open from their device with the HighClaws CLI, using the
-  Sandbox Access Code from Safe Connect in the Sandbox Management Console. This
-  tunnel is protected and obfuscated such that no man in the middle can
-  easily tell which port or service the user is reaching.
-- **UDP via static NAT:** only fixed UDP ports are directly published for
-  user services: `{{PUBLIC_PORT_8000}}-{{PUBLIC_PORT_8080}}:8000-8080/udp`
-  (public:internal). Look up this sandbox's public IP from a well-known IP
-  address lookup service, e.g. `curl https://ifconfig.me`, then give the user
-  that address with the mapped public port to connect to.
-
-Bind services to `0.0.0.0`; no service runs on 2023 by default. Configure
-application authentication as needed.
-
 ## Sandbox Home Page
 `SANDBOX_ROOT_URL/` is the user's private home page, open only to the
 logged-in user. It is forwarded to the hard-coded port `8089` of this sandbox.
@@ -98,6 +70,38 @@ as `/foo/bar`, so you do not need to study or configure that routing.
 `/home/agent/home-ui-demo/` is a runnable demo of the service APIs; start with
 its `index.html`. Use it as a code reference; build the page with any framework
 or language.
+
+## Exposing Services
+Services you run listen on local ports (`localhost:<port>`) and are not
+reachable from the internet by default. Use one of these methods to let the
+user reach a service:
+
+- **HTTP/HTTPS via Cloudflare:** use the pre-installed `cloudflared` CLI with
+  a user-owned domain, or a Quick Tunnel for a temporary URL.
+- **HTTP/HTTPS via a home page subroute:** serve it under a path of the
+  Sandbox Home Page, e.g. `SANDBOX_ROOT_URL/my-app/`, by having the port `8089`
+  server host the files or proxy that path to your service. Unlike a Quick
+  Tunnel, the URL is stable, but only the logged-in user can open it.
+- **TCP via Cloudflare:** run
+  `cloudflared tunnel --url tcp://127.0.0.1:<service-port>` on this sandbox;
+  it prints the tunnel name. On the user's device, run
+  `cloudflared access tcp --hostname <tunnel-name> --url 127.0.0.1:<free-port>`,
+  where `<free-port>` is a free port on the user's device, then connect to
+  `127.0.0.1:<free-port>`.
+- **Forward TCP Tunnel:** `2023` is the fixed TCP port reserved for a service
+  that only the user should reach. The user reaches it through an encrypted
+  tunnel they open from their device with the HighClaws CLI, using the
+  Sandbox Access Code from Safe Connect in the Sandbox Management Console. This
+  tunnel is protected and obfuscated such that no man in the middle can
+  easily tell which port or service the user is reaching.
+- **UDP via static NAT:** only fixed UDP ports are directly published for
+  user services: `{{PUBLIC_PORT_8000}}-{{PUBLIC_PORT_8080}}:8000-8080/udp`
+  (public:internal). Look up this sandbox's public IP from a well-known IP
+  address lookup service, e.g. `curl https://ifconfig.me`, then give the user
+  that address with the mapped public port to connect to.
+
+Bind services to `0.0.0.0`; no service runs on 2023 by default. Configure
+application authentication as needed.
 
 ## Web Browser
 This sandbox is connected to a side-car browser over Docker bridge network.
