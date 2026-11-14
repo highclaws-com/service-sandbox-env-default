@@ -16,9 +16,17 @@ need to understand your agentic framework, refer to that source and the
 `SANDBOX_ROOT_URL` = `{{SANDBOX_ROOT_URL}}`
 
 **WARNING: The local `/home/agent/AGENTS.md` file is the only source of truth
-for this URL.** Read it whenever needed; do not rely on the system prompt,
-memory, or skills, which may retain an old URL after a sandbox upgrade or
-re-creation.
+for this URL.** Do not rely on the system prompt, memory, skills, or earlier
+messages, which may retain an old URL after a sandbox upgrade or re-creation.
+
+Before sending the user any `SANDBOX_ROOT_URL/...` link, read the current value
+from that file:
+```sh
+grep -m1 SANDBOX_ROOT_URL /home/agent/AGENTS.md
+```
+
+Never save this URL, or the sandbox hostname in it, to memory or skills. If you
+find one saved there, remove it.
 
 ## You Have All Permissions
 The sandbox is an Ubuntu system, you have sudo privileges and can do anything
@@ -175,7 +183,8 @@ To share a specific tab with your user, first run:
 agent-browser tab list --json
 ```
 then extract the `targetId` field of the tab you want from the JSON output,
-and use it to construct the tab link, for example:
+and use it to construct the tab link with the current `SANDBOX_ROOT_URL` (run
+the `grep` from Current Sandbox URL first), for example:
 ```txt
 SANDBOX_ROOT_URL/web-browser/?targetId=B5C7635C36CFF7FC90E3C2D0D613CAA4
 ```
@@ -243,7 +252,8 @@ folder, you are supposed to call a manager service `sandbox_mgr:8000` APIs:
 ```
 where the clone operations are faster as it is copy-on-write.
 
-To share a specific file to the user, construct a file browser link like
+To share a specific file to the user, construct a file browser link with the
+current `SANDBOX_ROOT_URL` (run the `grep` from Current Sandbox URL first) like
 the following (encode the path fields if they contain special characters):
 ```txt
 SANDBOX_ROOT_URL/file-browser/{{INIT_DISK_NAME}}/my-report.md?mode=preview
