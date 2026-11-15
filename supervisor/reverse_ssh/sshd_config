@@ -1,18 +1,20 @@
-# sshd for the user's `ssh -R`: a login can only open 127.0.0.1:2222 here.
+# sshd for the user's `ssh -R`: a login can only open a 127.0.0.1 port, and
+# each key's permitlisten in authorized_keys limits it to its own port.
 # Keys come from sandbox_mgr via the /etc/ssh/reverse_ssh mount.
 Port 2022
-HostKey /etc/ssh/reverse_ssh/host_key
-AuthorizedKeysFile /etc/ssh/reverse_ssh/authorized_keys
+HostKey /etc/ssh/reverse_ssh/host.key
+# e.g. tunnel2222 -> /etc/ssh/reverse_ssh/authorized_keys.tunnel2222
+AuthorizedKeysFile /etc/ssh/reverse_ssh/authorized_keys.%u
 
-AllowUsers tunnel
+AllowUsers tunnel*
 PasswordAuthentication no
 KbdInteractiveAuthentication no
 
 AllowTcpForwarding remote
 AllowStreamLocalForwarding no
-PermitListen 127.0.0.1:2222
+PermitListen 127.0.0.1:*
 ForceCommand /bin/false
 
-# Drop dead clients so a reconnect can claim 127.0.0.1:2222 again.
+# Drop dead clients so a reconnect can claim its port again.
 ClientAliveInterval 30
 ClientAliveCountMax 3

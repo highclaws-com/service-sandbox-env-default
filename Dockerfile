@@ -69,9 +69,12 @@ RUN apt-get update && apt-get install -y \
     unzip \
     && rm -rf /var/lib/apt/lists/*
 
-# The user's `ssh -R` logs in as `tunnel`; "*" = no password, keys still work.
-RUN useradd --system --no-create-home --shell /usr/sbin/nologin \
-    --password '*' tunnel
+# The user's `ssh -R` logs in as the user of its port, e.g. tunnel2222;
+# "*" = no password, keys still work. Must match sandbox_mgr's CLIENT_PORTS.
+RUN for port in $(seq 2222 2231); do \
+        useradd --system --no-create-home --shell /usr/sbin/nologin \
+            --password '*' "tunnel$port"; \
+    done
 
 # cloudflared from the GitHub release (the apt repo only keeps the latest version).
 ARG CLOUDFLARED_VERSION=2026.10.7
