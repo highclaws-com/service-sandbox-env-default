@@ -581,8 +581,9 @@ profile holds website logins, etc. When the user asks to back up or restore
 profiles; "my logins" or "the browser" mean the browser profile. Backup files
 sit at the top level of the user's file browser.
 
-Except the agent backup, these calls stop the browser or the agents to keep the
-data consistent, so they may be cut off without a result even when they work.
+The restores and the browser backup stop the browser or the agents to keep the
+data consistent; the restores may be cut off without a result even when they
+work.
 - Do NOT chain a call with another command; run each call on its own.
 - Do NOT run a call again to check whether it worked. After a backup, look
   for the new zip in `/worktrees`. After a browser restore, ask the user to
