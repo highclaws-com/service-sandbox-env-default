@@ -392,7 +392,9 @@ tunnel instead of starting duplicates.
 
 ## Connecting to User Local Devices
 The Reverse SSH Tunnel uses sandbox TCP 2022. It lets the sandbox reach
-the user's computer through the SSH forward on sandbox loopback TCP 2222.
+each connected user device through its own SSH forward on sandbox loopback
+TCP 2222-2231, one port per device, at most 10 devices. Do not run your
+own services on these ports.
 
 Help the user connect their local computer to this sandbox using the HighClaws
 CLI — `hc` — from `https://github.com/highclaws-com/cli`: to synchronize local
@@ -411,8 +413,8 @@ capabilities.
   Tell it to read the repository's README.md and AGENTS.md, download and install
   `hc`, and complete the local setup. For SSH-based access, tell it to enable
   and test SSH, then open the reverse tunnel from the README. Do not ask the
-  user to perform those steps themselves. You then connect to the target
-  computer with `ssh -p 2222 <user>@localhost`.
+  user to perform those steps themselves. You then connect with
+  `ssh -p <port> <user>@localhost`.
 - Only if they have no local AI agent, read the CLI repository's README.md and
   AGENTS.md yourself and ask which OS they use if it is not already known;
   release binaries and prerequisites are platform-specific. Guide them through
@@ -420,11 +422,7 @@ capabilities.
   how to use a terminal.
 - `hc` must be installed on the target computer for every use case in this
   section and in Remote Control of User Computers. For SSH-based access,
-  including remote control, do not proceed until the reverse tunnel is running.
-  If another computer is already using that tunnel, fallback to `hc expose tcp:22`
-  and bridge its hostname with `cloudflared access tcp` on a different local port.
-  Remind the user that `hc expose tcp:22` must only be temporary and is unsafe
-  because it exposes their SSH port publicly.
+  including remote control, do not proceed until that device is `connected`.
 
 If you receive a Cloudflare tunnel address, such as a `*.trycloudflare.com`
 hostname, it may be a tunnel the user exposed with `hc expose` on their own.
