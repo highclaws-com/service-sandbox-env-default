@@ -68,6 +68,9 @@ let sessionId = null;
 
 // GET  /tabs                  -> [{id, title, url, faviconUrl, type, visible}]
 // Lists browser tabs; visible identifies the tab currently shown.
+// faviconUrl 'cache:<url>' means: load the icon from /favicon?url=<url>.
+
+// GET  /favicon?url=<url>     -> the cached icon as an image, or 404
 
 // POST /new-tab               {url, colorScheme, language} -> {status, id}
 // Opens a URL in a new tab; switch-tab brings it into view.

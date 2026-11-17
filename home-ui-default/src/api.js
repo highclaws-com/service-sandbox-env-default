@@ -91,6 +91,12 @@ export const answerApproval = (profile, runId, choice, requestId) =>
 // Shared browser: tabs -> [{id, title, url, faviconUrl, type, visible}].
 export const listTabs = () => json('/web-browser/api/tabs')
 
+// e.g. 'cache:https://github.com/favicon.ico'
+//   -> '/web-browser/api/favicon?url=https%3A%2F%2Fgithub.com%2Ffavicon.ico'
+export const resolveCachedFavicon = (faviconUrl) => faviconUrl.startsWith('cache:')
+  ? `/web-browser/api/favicon?url=${encodeURIComponent(faviconUrl.slice(6))}`
+  : faviconUrl
+
 export const switchTab = (id) =>
   json(`/web-browser/api/switch-tab/${id}`, { method: 'POST' })
 

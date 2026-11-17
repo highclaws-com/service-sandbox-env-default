@@ -4,7 +4,7 @@
     <div ref="strip" class="tabs" @wheel="onWheel">
       <div v-for="tab in tabs" :key="tab.id" class="tab" :class="{ on: tab.visible }">
         <button class="tab-pick" :title="tab.url" @click="show(tab.id)">
-          <img v-if="tab.faviconUrl" :src="tab.faviconUrl" alt="">
+          <img v-if="tab.faviconUrl" :src="resolveCachedFavicon(tab.faviconUrl)" alt="">
           <span class="tab-title">{{ tab.title || tab.url }}</span>
         </button>
         <button class="tab-close" :title="t('close_tab')" @click="close(tab.id)">✕</button>
@@ -22,7 +22,7 @@
 import { nextTick, onMounted, ref } from 'vue'
 import i18next from 'i18next'
 import { useTranslation } from 'i18next-vue'
-import { listTabs, switchTab, closeTab, newTab } from '../api'
+import { listTabs, switchTab, closeTab, newTab, resolveCachedFavicon } from '../api'
 import SideDrawer from './SideDrawer.vue'
 
 defineEmits(['close'])
