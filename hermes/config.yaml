@@ -53,6 +53,8 @@ model:
 providers:
   sandbox_proxy:
     base_url: http://sandbox_model_proxy:18790/v1
+    extra_headers:
+      User-Agent: HermesAgent/1.0
     session_affinity_header: x-opencode-session
 streaming:
   enabled: true
