@@ -283,6 +283,14 @@ The Core Supervisor runs Hermes; do not modify `/etc/supervisor/conf.d`. Put
 services you create in `/home/agent/.supervisor/conf.d/*.conf`. Bad configs there
 may stop the User Supervisor, but cannot stop Hermes or restart the sandbox.
 
+Never restart Hermes with `supervisorctl`: its `restart` sends a stop, then a
+start, but you run inside Hermes, so the stop kills you before the start is
+sent. To restart, confirm with the user first, then restart the sandbox using
+the Sandbox Management API instead:
+```sh
+curl -X POST http://sandbox_mgr:8000/api/v1/restart
+```
+
 In this sandbox, assume that any service requested by the user should be
 persistent unless the user clearly says it is temporary. Therefore, add
 services to Supervisor instead of starting them only in the current shell,
